@@ -2,6 +2,9 @@
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 import Test from './components/Test.vue'
+import { ref } from 'vue';
+
+const msg = ref('hahaha');
 </script>
 
 <template>
@@ -10,7 +13,9 @@ import Test from './components/Test.vue'
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
-      <Test title="Why Vue is so fun" />
+      
+      <Test title="Why Vue is so fun"  v-model="msg"/>
+      <h1>{{ msg }}</h1>
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
