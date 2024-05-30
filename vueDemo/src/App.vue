@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import Test from './components/Test.vue'
+import { defineAsyncComponent } from 'vue'
+//import Test from './components/Test.vue'
 import { ref } from 'vue';
+
+const Test = defineAsyncComponent(() =>
+  import('./components/Test.vue')
+)
 
 const msg = ref('hahaha');
 </script>
@@ -13,9 +18,24 @@ const msg = ref('hahaha');
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
-      
-      <Test title="Why Vue is so fun"  v-model="msg"/>
+
+      <Test title="Why Vue is so fun" v-model="msg" />
       <h1>{{ msg }}</h1>
+
+      <BaseLayout>
+        <template #header>
+          <h1>Here might be a page title</h1>
+        </template>
+
+        <template #default>
+          <p>A paragraph for the main content.</p>
+          <p>And another one.</p>
+        </template>
+
+        <template #footer>
+          <p>Here's some contact info</p>
+        </template>
+      </BaseLayout>
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
@@ -23,9 +43,9 @@ const msg = ref('hahaha');
       </nav>
     </div>
   </header>
-
   <RouterView />
 </template>
+
 
 <style scoped>
 header {
