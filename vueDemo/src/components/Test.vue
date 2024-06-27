@@ -3,6 +3,12 @@ import { ref } from 'vue'
 defineProps(['title'])
 const count = ref(0)
 const model = defineModel()
+function increment(current, max = 10) {
+  if (current < max) {
+    return current + 1
+  }
+  return current
+}
 </script>
 
 <template>
