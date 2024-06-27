@@ -3,13 +3,18 @@ import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 import { defineAsyncComponent } from 'vue'
 //import Test from './components/Test.vue'
-import { ref } from 'vue';
+import { ref } from 'vue'
+import ChildComponent from './components/ChildComponent.vue'
 
 const Test = defineAsyncComponent(() =>
   import('./components/Test.vue')
 )
 
 const msg = ref('hahaha');
+
+const first = ref('John')
+const last = ref('Doe')
+
 </script>
 
 <template>
@@ -18,9 +23,14 @@ const msg = ref('hahaha');
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
-
-      <Test title="Why Vue is so fun" v-model="msg" />
+      <p>
+        <Test title="Why Vue is so fun" v-model="msg" />
       <h1>{{ msg }}</h1>
+      </p>
+      <p>
+        <ChildComponent v-model:first-name="first" v-model:last-name="last" />
+      <p>{{ first }} {{ last }}</p>
+      </p>
 
       <BaseLayout>
         <template #header>
