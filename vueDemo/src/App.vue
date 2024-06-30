@@ -34,7 +34,7 @@ const last = ref('Doe')
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/about">Sample</RouterLink>
       </nav>
     </div>
 

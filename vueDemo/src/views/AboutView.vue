@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import Template from '../components/TabTemplate.vue'
+import TabTemplate from '../components/TabTemplate.vue'
+import TabEvent from '../components/TabEvent.vue'
 
 const currentTab = ref('Home')
 
 const tabs = {
-  Template,
+  TabTemplate,
+  TabEvent,
 }
 
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import Event from './Event.vue'
+import EventSyntax from './EventSyntax.vue'
 
 </script>
 <template>
@@ -8,6 +8,6 @@ import Event from './Event.vue'
         事件语法
     </div>
     <div>
-        <Event />
+        <EventSyntax />
     </div>
 </template>
