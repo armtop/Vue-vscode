@@ -2,12 +2,14 @@
 import { ref } from 'vue'
 import TabTemplate from '../components/TabTemplate.vue'
 import TabEvent from '../components/TabEvent.vue'
+import TabReactive from '../components/TabReactive.vue'
 
 const currentTab = ref('Home')
 
 const tabs = {
   TabTemplate,
   TabEvent,
+  TabReactive,
 }
 
 

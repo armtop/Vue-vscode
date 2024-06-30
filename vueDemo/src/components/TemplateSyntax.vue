@@ -78,8 +78,8 @@ const todos = ref([
     <!-- 绑定 attribute -->
     <img v-bind:src="imageSrc" width="100" height="100" />
 
-    <!-- 动态 attribute 名 -->
-    <p><button v-bind:[key]="value">按钮</button></p>
+    <!-- 动态 attribute 名，注意key和value是变量 -->
+    <p><button v-bind:[key]="value">动态按钮属性</button></p>
 
     <!-- class 绑定 -->
     <div :class="{ red: isRed }">class 绑定</div>
