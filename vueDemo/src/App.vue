@@ -1,17 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import { defineAsyncComponent } from 'vue'
-//import Test from './components/Test.vue'
 import { ref } from 'vue'
-import ChildComponent from './components/ChildComponent.vue'
 
-const Test = defineAsyncComponent(() =>
-  import('./components/Test.vue')
-)
 
 const msg = ref('hahaha');
-
 const first = ref('John')
 const last = ref('Doe')
 
@@ -23,14 +16,6 @@ const last = ref('Doe')
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
-      <p>
-        <Test title="Why Vue is so fun" v-model="msg" />
-      <h1>{{ msg }}</h1>
-      </p>
-      <p>
-        <ChildComponent v-model:first-name="first" v-model:last-name="last" />
-      <p>{{ first }} {{ last }}</p>
-      </p>
 
       <BaseLayout>
         <template #header>
@@ -52,6 +37,7 @@ const last = ref('Doe')
         <RouterLink to="/about">About</RouterLink>
       </nav>
     </div>
+
   </header>
   <RouterView />
 </template>
@@ -118,5 +104,75 @@ nav a:first-of-type {
     padding: 1rem 0;
     margin-top: 1rem;
   }
+}
+
+.demo {
+  font-family: sans-serif;
+  border: 1px solid #eee;
+  border-radius: 2px;
+  padding: 20px 30px;
+  margin-top: 1em;
+  margin-bottom: 40px;
+  user-select: none;
+  overflow-x: auto;
+}
+
+.tab-button {
+  padding: 6px 10px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background: #f0f0f0;
+  margin-bottom: -1px;
+  margin-right: -1px;
+}
+
+.tab-button:hover {
+  background: #e0e0e0;
+}
+
+.tab-button.active {
+  background: #e0e0e0;
+}
+
+.tab {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+<style>.demo {
+  font-family: sans-serif;
+  border: 1px solid #eee;
+  border-radius: 2px;
+  padding: 20px 30px;
+  margin-top: 1em;
+  margin-bottom: 40px;
+  user-select: none;
+  overflow-x: auto;
+}
+
+.tab-button {
+  padding: 6px 10px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background: #f0f0f0;
+  margin-bottom: -1px;
+  margin-right: -1px;
+}
+
+.tab-button:hover {
+  background: #e0e0e0;
+}
+
+.tab-button.active {
+  background: #e0e0e0;
+}
+
+.tab {
+  border: 1px solid #ccc;
+  padding: 10px;
 }
 </style>
