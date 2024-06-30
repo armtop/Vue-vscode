@@ -24,19 +24,16 @@ const obj = ref({
 async function mutateDeeply() {
   // 注意，此时修改对象时： obj.value.nested
   obj.value.nested.count++
-  console.log("nextTick前"+document.getElementById('btcount').textContent)
-  console.log("nextTick前"+document.getElementById('btarr').textContent)
+  console.log("nextTick前"+document.getElementById('btcount')?.textContent||'Element not found')
+  console.log("nextTick前"+document.getElementById('btarr')?.textContent||'Element not found')
   // Vue 会在“next tick”更新周期中缓冲所有状态的修改，
   // 以确保不管你进行了多少次状态修改，每个组件都只会被更新一次。
   await nextTick()
   // 现在 DOM 已经更新了
   obj.value.arr.push('baz'+obj.value.nested.count)
-  console.log(document.getElementById('btcount').textContent)
-  console.log(document.getElementById('btarr').textContent)
+  console.log(document.getElementById('btcount')?.textContent||'Element not found')
+  console.log(document.getElementById('btarr')?.textContent||'Element not found')
 }
-
-
-
 </script>
 
 <template>

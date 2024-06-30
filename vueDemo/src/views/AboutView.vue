@@ -1,27 +1,39 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref,computed } from 'vue'
 import TabTemplate from '../components/TabTemplate.vue'
 import TabEvent from '../components/TabEvent.vue'
 import TabReactive from '../components/TabReactive.vue'
 
-const currentTab = ref('Home')
+// 定义标签信息，以提高可维护性
+const tabList = [
+  { name: 'TabTemplate', component: TabTemplate },
+  { name: 'TabEvent', component: TabEvent },
+  { name: 'TabReactive', component: TabReactive },
+];
 
-const tabs = {
-  TabTemplate,
-  TabEvent,
-  TabReactive,
+// 使用ref绑定当前选中的标签索引，而不是直接绑定标签名
+const currentTabIndex = ref(0);
+
+// 计算属性用于获取当前选中的标签信息
+const currentTab = computed(() => tabList[currentTabIndex.value]);
+
+// 提供方法来切换标签，增加逻辑控制和异常处理的空间
+function switchTab(index:number) {
+  if (index < 0 || index >= tabList.length) {
+    console.error('Invalid tab index');
+    return;
+  }
+  currentTabIndex.value = index;
 }
-
-
 </script>
 
 <template>
   <div class="demo">
-    <button v-for="(_, tab) in tabs" :key="tab" :class="['tab-button', { active: currentTab === tab }]"
-      @click="currentTab = tab">
-      {{ tab }}
+    <button v-for="(tab, index) in tabList" :key="tab.name" :class="['tab-button', { active: currentTabIndex === index }]"
+      @click="switchTab(index)">
+      {{ tab.name }}
     </button>
-    <component :is="tabs[currentTab]" class="tab"></component>
+    <component :is="currentTab.component" class="tab"></component>
   </div>
 </template>
 
