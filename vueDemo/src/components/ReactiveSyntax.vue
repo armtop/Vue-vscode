@@ -22,7 +22,7 @@ const obj = ref({
   arr: ['foo', 'bar']
 })
 async function mutateDeeply() {
-  // 注意，此时修改对象时： obj.value.nested
+  // 注意，此时修改对象为： obj.value.nested
   obj.value.nested.count++
   console.log("nextTick前"+document.getElementById('btcount')?.textContent||'Element not found')
   console.log("nextTick前"+document.getElementById('btarr')?.textContent||'Element not found')
