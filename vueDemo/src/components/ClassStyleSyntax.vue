@@ -9,6 +9,14 @@ const classObject = computed(() => ({
   'color: green': color.value
 }))
 
+const activeColor = ref('red')
+const fontSize = ref(30)
+const styleObject = ref({
+  color: 'green'
+})
+const styleObject2 = ref({
+  fontSize: '20px'
+})
 </script>
 
 <template>
@@ -17,6 +25,10 @@ const classObject = computed(() => ({
     <button @click="isActive = !isActive">Toggle</button>
 </div>
 <div :class="classObject">classObject</div>
+<!-- :class 更适合用于切换多个预定义的 CSS 类，而 :style 则更适合用于动态设置具体的 CSS 属性值 -->
+<div :style="{ color: activeColor, fontSize: fontSize + 'px' }">style</div>
+<div :style="styleObject">styleObject</div>
+<div :style="[styleObject, styleObject2]">style数组</div>
 </template>
 
 <style>
