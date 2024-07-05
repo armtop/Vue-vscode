@@ -29,10 +29,11 @@ const styleObject2 = ref({
 <div :style="{ color: activeColor, fontSize: fontSize + 'px' }">style</div>
 <div :style="styleObject">styleObject</div>
 <div :style="[styleObject, styleObject2]">style数组</div>
+<div :style="{ 'font-size': fontSize + 'px' }">style string </div>
+
 </template>
 
 <style>
-
 .static {
   font-family: sans-serif;
   border: 1px solid #eee;
@@ -47,18 +48,5 @@ const styleObject2 = ref({
 .active{
   color: red;
   background: #f0f0f0;
-}
-
-.tab-button:hover {
-  background: #e0e0e0;
-}
-
-.tab-button.active {
-  background: #e0e0e0;
-}
-
-.tab {
-  border: 1px solid #ccc;
-  padding: 10px;
 }
 </style>

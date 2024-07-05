@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-defineProps(['title'])
+
 const count = ref(0)
 const model = defineModel()
 function increment(current, max = 10) {
@@ -9,6 +9,8 @@ function increment(current, max = 10) {
   }
   return current
 }
+
+defineProps(['title'])
 </script>
 
 <template>
@@ -17,7 +19,7 @@ function increment(current, max = 10) {
     <slot name="sh5"></slot>
   </h5>
   <button @click="count++">You clicked me {{ count }} times.</button>
-  <div>Parent bound vmodel is: <input type="text" v-model="model"></div>
+  <div>Parent bound vmodel is: <input type="text" v-model="model">{{ model }}</div>
 
   <div class="container">
     <header>

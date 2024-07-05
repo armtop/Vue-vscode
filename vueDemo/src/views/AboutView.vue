@@ -5,6 +5,7 @@ import TabEvent from '../components/TabEvent.vue'
 import TabReactive from '../components/TabReactive.vue'
 import TabComputed from '../components/TabComputed.vue'
 import TabClassStyle from '@/components/TabClassStyle.vue'
+import TabForm from '@/components/TabForm.vue'
 
 
 // 定义标签信息，以提高可维护性
@@ -14,6 +15,7 @@ const tabList = [
   { name: 'TabReactive', component: TabReactive },
   { name: 'TabComputed', component:TabComputed},
   { name: 'TabClassStyle', component: TabClassStyle },
+  { name: 'TabForm', component: TabForm },
 ];
 
 // 使用ref绑定当前选中的标签索引，而不是直接绑定标签名

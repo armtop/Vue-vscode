@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import Test from './Test.vue'
 
 const msg = ref('Hello World!')
 const rawHtml = ref('<span style="color: red;">This should be red</span>')
@@ -131,4 +132,11 @@ const cycleType=()=> {
     <!-- 使用 JavaScript 表达式 -->
     <p>{{ number + 1 }}</p>
     <p>{{ msg.split('').reverse().join('') }}</p>
+    <p>
+        <Test v-for ="(todo,index ) in todos"
+            :key="todo.id"
+            :index="index"
+            :title="todo.title"          
+            ></Test>
+    </p>
 </template>
