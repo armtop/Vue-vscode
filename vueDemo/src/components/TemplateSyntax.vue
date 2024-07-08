@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Test from './Test.vue'
 
 const msg = ref('Hello World!')
@@ -36,20 +36,41 @@ const todos = ref([
         title: 'Mow the lawn'
     }
 ])
-const currenttype =ref('A')
-const cycleType=()=> {
-      // 使用数组来简化循环逻辑，数组中包含所有可能的type值
-      const types = ['A', 'B', 'C', 'D'];
-      
-      // 找到当前type值在数组中的索引，如果不存在，则默认为0
-      const currentIndex = types.indexOf(currenttype.value);
-          
-      // 循环到下一个值，如果已经是最后一个则回到第一个
-      var nextIndex = (currentIndex + 1) % types.length;
-      
-      // 更新currentType的值
+const currenttype = ref('A')
+const cycleType = () => {
+    // 使用数组来简化循环逻辑，数组中包含所有可能的type值
+    const types = ['A', 'B', 'C', 'D'];
+
+    // 找到当前type值在数组中的索引，如果不存在，则默认为0
+    const currentIndex = types.indexOf(currenttype.value);
+
+    // 循环到下一个值，如果已经是最后一个则回到第一个
+    var nextIndex = (currentIndex + 1) % types.length;
+
+    // 更新currentType的值
     currenttype.value = types[nextIndex];
 }
+
+// 虽然 Vue 的声明性渲染模型为你抽象了大部分对 DOM 的直接操作，但在某些情况下，我们仍然需要直接访问底层 DOM 元素。要实现这一点，我们可以使用特殊的 ref attribute
+// 声明一个 ref 来存放该元素的引用,必须和模板里的 ref 同名
+const input = ref<HTMLInputElement | null>(null);
+// 组件引用
+const test = ref(null)
+
+onMounted(() => {
+    if (input.value) {
+        input.value.focus() // 设置默认光标
+    }
+    console.log(test.value)
+})
+
+const itemRefs = ref([])
+
+// 函数模板引用
+const md = ref()
+
+
+
 </script>
 
 <template>
@@ -61,25 +82,27 @@ const cycleType=()=> {
     <p>使用文本插值：{{ rawHtml }}</p>
     <p>使用 v-show 指令，v-show 不支持在 template 元素上使用，也不能和 v-else 搭配使用：
         <span v-show="ok">ok is {{ ok }}</span>
-        <button @click="ok = !ok">Toggle</button></p>
+        <button @click="ok = !ok">Toggle</button>
+    </p>
     <p>使用 v-if 指令：
         <span v-if="ok">Vue is awesome!</span>
         <span v-else>Oh no 😢</span>
-        <button @click="ok = !ok">Toggle</button></p>
-    <p>使用 v-else-if 指令： 
+        <button @click="ok = !ok">Toggle</button>
+    </p>
+    <p>使用 v-else-if 指令：
         <button @click="cycleType">Toggle</button>
-        <div v-if="currenttype === 'A'">
+    <div v-if="currenttype === 'A'">
         A
-        </div>
-        <div v-else-if="currenttype === 'B'">
+    </div>
+    <div v-else-if="currenttype === 'B'">
         B
-        </div>
-        <div v-else-if="currenttype === 'C'">
+    </div>
+    <div v-else-if="currenttype === 'C'">
         C
-        </div>
-        <div v-else>
+    </div>
+    <div v-else>
         Not A/B/C
-        </div>
+    </div>
     </p>
     <p>在template使用 v-if 指令：
         <template v-if="ok">
@@ -132,11 +155,16 @@ const cycleType=()=> {
     <!-- 使用 JavaScript 表达式 -->
     <p>{{ number + 1 }}</p>
     <p>{{ msg.split('').reverse().join('') }}</p>
-    <p>
-        <Test v-for ="(todo,index ) in todos"
-            :key="todo.id"
-            :index="index"
-            :title="todo.title"          
-            ></Test>
+    <p>循环Test组件:
+        <Test v-for="(todo, index ) in todos" :key="todo.id" :index="index" :title="todo.title" ref="itemRefs"></Test>
+    </p>
+    <p>Test组件变量
+    <div v-for="item in itemRefs" ref="test">{{ item }}</div>
+    </p>
+    <p>访问模板引用:
+        <input ref="input" />
+    </p>
+    <p>函数模板引用:
+        <input :ref="(el) => { md = el }" />
     </p>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,computed } from 'vue'
+import { ref, computed } from 'vue'
 import TabTemplate from '../components/TabTemplate.vue'
 import TabEvent from '../components/TabEvent.vue'
 import TabReactive from '../components/TabReactive.vue'
@@ -14,7 +14,7 @@ const tabList = [
   { name: 'TabTemplate', component: TabTemplate },
   { name: 'TabEvent', component: TabEvent },
   { name: 'TabReactive', component: TabReactive },
-  { name: 'TabComputed', component:TabComputed},
+  { name: 'TabComputed', component: TabComputed },
   { name: 'TabClassStyle', component: TabClassStyle },
   { name: 'TabForm', component: TabForm },
   { name: 'TabWatch', component: TabWatch },
@@ -27,7 +27,10 @@ const currentTabIndex = ref(0);
 const currentTab = computed(() => tabList[currentTabIndex.value]);
 
 // 提供方法来切换标签，增加逻辑控制和异常处理的空间
-function switchTab(index:number) {
+function switchTab(index: number) {
+  if (typeof index !== 'number') {
+    throw new TypeError('Expected index to be of type number');
+  }
   if (index < 0 || index >= tabList.length) {
     console.error('Invalid tab index');
     return;
@@ -38,8 +41,8 @@ function switchTab(index:number) {
 
 <template>
   <div class="demo">
-    <button v-for="(tab, index) in tabList" :key="tab.name" :class="['tab-button', { active: currentTabIndex === index }]"
-      @click="switchTab(index)">
+    <button v-for="(tab, index) in tabList" :key="tab.name"
+      :class="['tab-button', { active: currentTabIndex === index }]" @click="switchTab(index)">
       {{ tab.name }}
     </button>
     <component :is="currentTab.component" class="tab"></component>
