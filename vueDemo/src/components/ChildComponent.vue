@@ -1,19 +1,26 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-// defineProps 对父组件开放属性，defineEmits 对父组件开放事件
-const props = defineProps(['firstTitle', 'lastTitle'])
-const emit = defineEmits(['update:firstName', 'update:lastName'])
+import { ref, computed } from 'vue'
+import GrandsonComponent from './GrandsonComponent.vue';
 
-// defineModel 支持双向绑定，通过父组件的 v-model 配合来使用
-const firstName = defineModel('firstName')
-const lastName = defineModel('lastName')
-const childmodel = defineModel()
+// defineProps 对父组件开放属性
+const props = defineProps(['firstTitle', 'lastTitle'])
+// defineEmits 对父组件开放事件
+const emit = defineEmits(['update:firstName', 'change:lastName'])
+
+// defineModel 支持多个双向绑定，通过父组件的 v-model 配合来使用
+const firstName = defineModel('firstName')  // 组件绑定多个v-model,defineModel里面要有值，否则报错
+const lastName = defineModel('lastName')    // 命名规则为camleCase,否则报错
+const childModel = defineModel('childModel')
+const fullName = computed(() => firstName.value + ' ' + lastName.value)
 </script>
 
 <template>
     <p>验证父子双向绑定（子）：</p>
-    <p>修改childmodel值：<input type="text" v-model="childmodel">{{ childmodel }}</p>
+    <p>修改childmodel值：<input type="text" v-model="childModel">{{ childModel }}</p>
     <p>验证defineProps：</p>
-    {{ firstTitle }}：<input type="text" v-model="firstName" />
-    {{ lastTitle }}：<input type="text" v-model="lastName" />
+    {{ firstTitle }}：<input type="text" v-model="firstName" @change="emit('update:firstName', $event.target.value)" />
+    <!-- 抛出事件，在父组件响应事件-->
+    {{ lastTitle }}：<input type="text" v-model="lastName" @change="emit('update:lastName', $event.target.value)" />
+    <p>{{ fullName }}</p>
+    <GrandsonComponent />
 </template>
