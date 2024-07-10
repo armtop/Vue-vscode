@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, defineAsyncComponent } from 'vue'
 import GrandsonComponent from './GrandsonComponent.vue';
+import LoadingComponent from './LoadingComponent.vue';
+import ErrorComponent from './ErrorComponent.vue';
 
 // defineProps 对父组件开放属性
 const props = defineProps(['firstTitle', 'lastTitle'])
@@ -12,6 +14,29 @@ const firstName = defineModel('firstName')  // 组件绑定多个v-model,defineM
 const lastName = defineModel('lastName')    // 命名规则为camleCase,否则报错
 const childModel = defineModel('childModel')
 const fullName = computed(() => firstName.value + ' ' + lastName.value)
+
+const AsyncComp = defineAsyncComponent(() => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve(import('./AsyncComponent.vue'))
+        }, 6000)
+    })
+})
+
+const AsyncComp2 = defineAsyncComponent({
+    loader: () => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(import('./AsyncComponent.vue'))
+            }, 3000)
+        })
+    },
+    loadingComponent: LoadingComponent,
+    delay: 200,
+    timeout: 6000,
+    errorComponent: ErrorComponent,
+})
+
 </script>
 
 <template>
@@ -23,4 +48,10 @@ const fullName = computed(() => firstName.value + ' ' + lastName.value)
     {{ lastTitle }}：<input type="text" v-model="lastName" @change="emit('update:lastName', $event.target.value)" />
     <p>{{ fullName }}</p>
     <GrandsonComponent />
+    <p>resolve异步组件,没有动画和占位符：
+        <AsyncComp />
+    </p>
+    <p>启用占位符
+        <AsyncComp2 />
+    </p>
 </template>

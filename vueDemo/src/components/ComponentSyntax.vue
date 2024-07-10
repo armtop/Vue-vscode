@@ -21,13 +21,11 @@ const changeParent = () => {
     alert('changeParent')
 }
 
-// 解决prop 逐级透传
+// 解决prop 逐级透传，传给孙子组件。在整个应用层面提供依赖 app.provide(/* 注入名 */ 'message', /* 值 */ 'hello!')
 const message = ref('hello')
 provide(/* 注入名 */ 'message', /* 值 */ message)
-// 在整个应用层面提供依赖 app.provide(/* 注入名 */ 'message', /* 值 */ 'hello!')
 
 const location = ref('North Pole')
-
 function updateLocation() {
     location.value = 'South Pole'
 }
