@@ -9,6 +9,7 @@ import TabForm from '@/components/TabForm.vue'
 import TabWatch from '@/components/TabWatch.vue'
 import TabComponent from '@/components/TabComponent.vue'
 import TabComposables from '@/components/TabComposables.vue'
+import TabRoute from '@/components/TabRoute.vue'
 
 
 // 定义标签信息，以提高可维护性
@@ -22,6 +23,7 @@ const tabList = [
   { name: 'TabWatch', component: TabWatch },
   { name: 'TabComponent', component: TabComponent },
   { name: 'TabComposables', component: TabComposables },
+  { name: 'TabRoute', component: TabRoute }
 ];
 
 // 使用ref绑定当前选中的标签索引，而不是直接绑定标签名
