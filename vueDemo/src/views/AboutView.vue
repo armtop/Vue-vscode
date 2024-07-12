@@ -53,7 +53,9 @@ function switchTab(index: number) {
       :class="['tab-button', { active: currentTabIndex === index }]" @click="switchTab(index)">
       {{ tab.name }}
     </button>
-    <component :is="currentTab.component" class="tab"></component>
+    <keep-alive>
+      <component :is="currentTab.component" class="tab" />
+    </keep-alive>
   </div>
 </template>
 

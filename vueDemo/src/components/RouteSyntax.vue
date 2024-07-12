@@ -23,5 +23,7 @@ const currentView = computed(() => {
     <a href="#/">HelloWorld</a>
     <a href="#/test">Test</a>
     <a href="#/posts">Posts</a>
-    <component :is="currentView" />
+    <keep-alive>
+        <component :is="currentView" />
+    </keep-alive>
 </template>
