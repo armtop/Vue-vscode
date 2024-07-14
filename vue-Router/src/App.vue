@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import { watch } from 'vue';
+
+const route = useRoute()
+watch(() => route.params.postId, (newId, oldId) => {
+  // 对路由变化做出响应...
+  console.log(newId, oldId)
+})
+
 </script>
 
 <template>
