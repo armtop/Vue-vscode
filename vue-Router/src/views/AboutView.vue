@@ -1,19 +1,37 @@
 <template>
-  <div class="about">
-    <p>
-      <strong>Current route path:</strong> {{ $route.fullPath }}
-    </p>
+  <div>
+    <p>路由1
     <nav>
       <RouterLink to="/class">Go to class</RouterLink>
-      <RouterLink to="/tom">Go to tom</RouterLink>
+      <RouterLink to="/class/tom">Go to tom</RouterLink>
+      <RouterLink to="/class/tom/a">tom/a</RouterLink>
       <RouterLink to="/users/eduardo/posts/1">/users1</RouterLink>
-      <RouterLink to="/users/eduardo/posts/20">/users20</RouterLink>
-      <RouterLink to="/users/eduardo/posts/30">/users30</RouterLink>
+      <RouterLink to="/users/abc">children</RouterLink>
+      <RouterLink to="/users/abc/profile">/users/abc/profile</RouterLink>
+      <RouterLink to="/users/abc/posts">/users/abc/posts</RouterLink>
+      <RouterLink to="/users/eduardo/posts/20/q">/users20/q</RouterLink>
+      <RouterLink to="/users/eduardo/posts/A30">/usersA30</RouterLink>
+      <RouterLink to="/user-">/user-</RouterLink>
+      <RouterLink to="/abc/123/ABC">/ABC</RouterLink>
     </nav>
+    </p>
+    <p>路由2
+    <nav>
+      <!-- 配合命名路由 -->
+      <router-link :to="{ name: 'class' }">/className</router-link>
+      <router-link :to="{ name: 'tom', params: { tom: 'ABC' } }">/classtom</router-link>
+      <!-- 配合命名视图 -->
+      <router-link to="/homepage">/homepage</router-link>
+    </nav>
+    </p>
+
     <main>
       <RouterView />
     </main>
   </div>
+  <router-view class="view one"></router-view>
+  <router-view class="view two" name="a"></router-view>
+  <router-view class="view three" name="b"></router-view>
 </template>
 
 <style>

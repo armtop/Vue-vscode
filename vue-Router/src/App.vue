@@ -6,6 +6,7 @@ import { watch } from 'vue';
 const route = useRoute()
 watch(() => route.params.postId, (newId, oldId) => {
   // 对路由变化做出响应...
+  console.log("对路由变化做出响应:")
   console.log(newId, oldId)
 })
 

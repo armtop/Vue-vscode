@@ -1,15 +1,16 @@
 <template>
     <div>
-        <p>UserView</p>
+        <p>UserProfile</p>
         <p>
             <strong>Current route path:</strong> {{ $route.fullPath }}
         </p>
-        afterUser: {{ $route.params.afterUser }}
+        username: {{ $route.params.username }} with post {{ $route.params.postId }}
         <p>
             pathMatch:{{ $route.params.pathMatch }}
         </p>
-        <p>子模板：</p>
-        <router-view />
+        <nav>
+            <RouterLink to="/users/abc/posts">/users/abc/posts</RouterLink>
+        </nav>
     </div>
 
 </template>
