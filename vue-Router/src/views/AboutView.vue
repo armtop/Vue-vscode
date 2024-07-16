@@ -22,6 +22,7 @@
       <router-link :to="{ name: 'tom', params: { tom: 'ABC' } }">/classtom</router-link>
       <!-- 配合命名视图 -->
       <router-link to="/homepage">/homepage</router-link>
+      <router-link to="/settings">/settings</router-link>
     </nav>
     </p>
 

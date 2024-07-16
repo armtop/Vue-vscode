@@ -3,6 +3,10 @@ import HomeView from '../views/HomeView.vue'
 import DefaultPage from '../components/DefaultPage.vue'
 import LeftSidebar from '../components/LeftSidebar.vue'
 import RightSidebar from '../components/RightSidebar.vue'
+import UserEmailsSubscriptions from '../components/UserEmailsSubscriptions.vue'
+import UserSettings from '../components/UserSettings.vue'
+import UserProfile from '../components/UserProfile.vue'
+import UserProfilePreview from '../components/UserProfilePreview.vue'
 
 const routes = [
   {
