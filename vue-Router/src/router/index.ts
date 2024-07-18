@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, useRoute } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import Class from '../components/ClassStyle.vue'
 import DefaultPage from '../components/DefaultPage.vue'
 import LeftSidebar from '../components/LeftSidebar.vue'
 import RightSidebar from '../components/RightSidebar.vue'
@@ -7,6 +8,7 @@ import UserEmailsSubscriptions from '../components/UserEmailsSubscriptions.vue'
 import UserSettings from '../components/UserSettings.vue'
 import UserProfile from '../components/UserProfile.vue'
 import UserProfilePreview from '../components/UserProfilePreview.vue'
+import UserId from '../components/UserId.vue'
 
 const routes = [
   {
@@ -33,7 +35,7 @@ const routes = [
     component: () => import('../components/TomWelcome.vue')
   },
   {
-    // /:postId -> 仅匹配数字
+    // :postId -> 仅匹配数字
     path: '/users/:username/posts/:postId(\\d+)',
     name: 'user-postid',
     component: () => import('../components/UserPosts.vue')
@@ -101,12 +103,30 @@ const routes = [
         }
       }
     ]
+  },
+  {
+    path: '/redirect',
+    redirect: {
+      name: 'class'
+    }
+  },
+  {
+    path: '/class',
+    component: Class,
+    alias: '/classalias'
+  },
+  {
+    path: '/user/:id',
+    component: UserId,
+    props: true
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes
+  //linkActiveClass: 'border-indigo-500',
+  //linkExactActiveClass: 'border-indigo-700'
 })
 
 export default router

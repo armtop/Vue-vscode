@@ -17,12 +17,15 @@
     </p>
     <p>路由2
     <nav>
-      <!-- 配合命名路由 -->
+      <!-- 命名路由 -->
       <router-link :to="{ name: 'class' }">/className</router-link>
       <router-link :to="{ name: 'tom', params: { tom: 'ABC' } }">/classtom</router-link>
-      <!-- 配合命名视图 -->
+      <!-- 命名视图 -->
       <router-link to="/homepage">/homepage</router-link>
       <router-link to="/settings">/settings</router-link>
+      <RouterLink to="/redirect">/redirect</RouterLink>
+      <RouterLink to="/classalias">/classalias</RouterLink>
+      <RouterLink to="/user/2">/userid</RouterLink>
     </nav>
     </p>
 
