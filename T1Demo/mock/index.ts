@@ -322,8 +322,8 @@ export default [
               },
               children: [
                 {
-                  path: 'doc',
-                  name: 'Doc',
+                  path: 'doc1',
+                  name: 'Doc11',
                   component: 'IFrame',
                   meta: {
                     frameSrc: 'https://tdesign.tencent.com/starter/docs/vue-next/get-started',
@@ -346,15 +346,53 @@ export default [
                   },
                 },
                 {
-                  path: 'TDesign2',
-                  name: 'TDesign2',
+                  path: 'TDesign',
+                  name: 'TDesign',
                   component: 'IFrame',
                   meta: {
                     frameSrc: 'https://tdesign.tencent.com/vue-next/getting-started',
                     frameBlank: true,
                     title: {
-                      zh_CN: 'TDesign 文档（外链',
+                      zh_CN: 'TDesign 文档(外链)',
                       en_US: 'TDesign Doc(Link)',
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              path: '/mydynamicpage',
+              name: 'Dynamic',
+              component: 'Layout',
+              redirect: '/mydynamicpage',
+              meta: {
+                icon: 'edit-1',
+                title: {
+                  zh_CN: '动态页面',
+                  en_US: 'Dynamicpage',
+                },
+              },
+              children: [
+                {
+                  path: 'baidu',
+                  name: 'BD',
+                  component: 'IFrame',
+                  meta: {
+                    frameSrc: 'https://www.baidu.com',
+                    title: {
+                      zh_CN: '百度搜索（内嵌）',
+                      en_US: 'baidu(IFrame)',
+                    },
+                  },
+                },
+                {
+                  path: 'base',
+                  name: 'newDynamicpage',
+                  component: '/mydynamicpage/base/index.vue',
+                  meta: {
+                    title: {
+                      zh_CN: '动态页面',
+                      en_US: 'dynamicpage',
                     },
                   },
                 },

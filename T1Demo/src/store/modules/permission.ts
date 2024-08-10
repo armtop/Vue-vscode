@@ -37,7 +37,7 @@ export const usePermissionStore = defineStore('permission', {
       }
     },
     async restoreRoutes() {
-      // 不需要在此额外调用initRoutes更新侧边导肮内容，在登录后asyncRoutes为空会调用
+      // 不需要在此额外调用initRoutes更新侧边导航内容，在登录后asyncRoutes为空会调用
       this.asyncRoutes.forEach((item: RouteRecordRaw) => {
         if (item.name) {
           router.removeRoute(item.name);

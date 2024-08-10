@@ -3,8 +3,11 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 const env = import.meta.env.MODE || 'development';
 
-// 导入homepage相关固定路由
+// 导入homepage相关固定首页路由
 const homepageModules = import.meta.glob('./modules/**/homepage.ts', { eager: true });
+
+// 导入newpage相关固定路由
+const newpageModules = import.meta.glob('./modules/**/newpage.ts', { eager: true });
 
 // 导入modules非homepage相关固定路由
 const fixedModules = import.meta.glob('./modules/**/!(homepage).ts', { eager: true });
@@ -23,9 +26,12 @@ const defaultRouterList: Array<RouteRecordRaw> = [
 ];
 // 存放固定路由
 export const homepageRouterList: Array<RouteRecordRaw> = mapModuleRouterList(homepageModules);
+
+export const newpageRouterList: Array<RouteRecordRaw> = mapModuleRouterList(newpageModules);
+
 export const fixedRouterList: Array<RouteRecordRaw> = mapModuleRouterList(fixedModules);
 
-export const allRoutes = [...homepageRouterList, ...fixedRouterList, ...defaultRouterList];
+export const allRoutes = [...homepageRouterList, ...fixedRouterList, ...defaultRouterList, ...newpageRouterList];
 
 // 固定路由模块转换为路由
 export function mapModuleRouterList(modules: Record<string, unknown>): Array<RouteRecordRaw> {
