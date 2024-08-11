@@ -3,6 +3,7 @@ export default {
     on: 'Enabled',
     off: 'Disabled',
   },
+  msg: 'Check me',
   manage: 'Manage',
   delete: 'Delete',
   commonTable: {

@@ -40,4 +40,7 @@ export default {
     back: '回到首页',
     reload: '重新加载',
   },
+  messages: {
+    greeting: '你好, 世界!',
+  },
 };

@@ -1,12 +1,13 @@
 import { DashboardIcon } from 'tdesign-icons-vue-next';
 import { shallowRef } from 'vue';
 
-import Layout from '@/layouts/index.vue';
+import Blank from '@/layouts/blank.vue';
+// import Layout from '@/layouts/index.vue';
 
 export default [
   {
     path: '/mynewpage',
-    component: Layout,
+    component: Blank,
     redirect: '/mynewpage/base',
     name: 'mynewpage',
     meta: {

@@ -7,7 +7,7 @@ import Layout from '@/layouts/index.vue';
 export default [
   {
     path: '/dashboard',
-    component: Blank,
+    component: Layout,
     redirect: '/dashboard/base',
     name: 'dashboard',
     meta: {

@@ -11,6 +11,7 @@ import listCard from './list-card';
 import listFilter from './list-filter';
 import listTree from './list-tree';
 import login from './login';
+import mydynamicpage from './mydynamicpage';
 import result from './result';
 import user from './user';
 
@@ -30,4 +31,5 @@ export default {
   user,
   login,
   result,
+  mydynamicpage,
 };
