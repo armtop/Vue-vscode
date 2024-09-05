@@ -1,5 +1,7 @@
 export interface TokenResult {
-  list: Array<UserTokenModel>;
+  success: boolean;
+  error: string;
+  debug: string;
 }
 export interface UserTokenModel {
   token: string;

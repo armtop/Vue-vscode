@@ -27,6 +27,11 @@ const transform: AxiosTransform = {
       return res;
     }
 
+    // 如果200无内容直接返回，正确的应该是判断是否是204，但是T1错误的给了200， 204 No Content：服务器成功处理了请求，但是没有返回任何内容
+    if (res.status === 200 && !res.data) {
+      return res;
+    }
+
     // 是否返回原生响应头 比如：需要获取响应头时使用该属性
     if (isReturnNativeResponse) {
       return res;
@@ -122,6 +127,10 @@ const transform: AxiosTransform = {
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token
       (config as Recordable).headers.Authorization = options.authenticationScheme
+        ? `${options.authenticationScheme} ${token}`
+        : token;
+      // T1 esbkey
+      (config as Recordable).headers.esbkey = options.authenticationScheme
         ? `${options.authenticationScheme} ${token}`
         : token;
     }

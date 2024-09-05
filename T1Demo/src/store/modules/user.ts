@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { getUserToken } from '@/api/usertoken';
 import { usePermissionStore } from '@/store';
 import type { UserInfo } from '@/types/interface';
 
@@ -47,7 +48,30 @@ export const useUserStore = defineStore('user', {
         };
       };
 
-      const res = await mockLogin(userInfo);
+      const fetchUserData = async (userInfo: Record<string, unknown>) => {
+        const { account, password } = userInfo;
+
+        try {
+          const response = await getUserToken(account, password);
+          console.log(`response:`, response);
+
+          return {
+            code: 200,
+            message: '登录成功',
+            data: response,
+          };
+        } catch (err) {
+          console.error(err);
+          return {
+            code: 400,
+            message: '登录失败',
+            data: err,
+          };
+        }
+      };
+
+      const res = await fetchUserData(userInfo);
+      console.log(`res:`, res);
       if (res.code === 200) {
         this.token = res.data;
       } else {
