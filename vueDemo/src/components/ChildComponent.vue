@@ -48,10 +48,19 @@ const AsyncComp2 = defineAsyncComponent({
     {{ lastTitle }}：<input type="text" v-model="lastName" @change="emit('update:lastName', $event.target.value)" />
     <p>{{ fullName }}</p>
     <GrandsonComponent />
-    <p>resolve异步组件,没有动画和占位符：
-        <AsyncComp />
-    </p>
-    <p>启用占位符
+    <p>异步组件加载示例：</p>
+    <Transition name="fade" mode="out-in">
+        <Suspense>
+            <template #default>
+                <AsyncComp />
+            </template>
+            <template #fallback>
+                <div class="loading">加载中...</div>
+            </template>
+        </Suspense>
+    </Transition>
+    <p>带有占位符的异步组件：</p>
+    <Transition name="fade" mode="out-in">
         <AsyncComp2 />
-    </p>
+    </Transition>
 </template>
