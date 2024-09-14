@@ -23,8 +23,8 @@
     <template #footer>
       <t-avatar-group cascading="left-up" :max="2">
         <t-avatar>{{ typeMap[product.type - 1] }}</t-avatar>
-        <t-avatar
-          ><template #icon>
+        <t-avatar>
+          <template #icon>
             <add-icon />
           </template>
         </t-avatar>

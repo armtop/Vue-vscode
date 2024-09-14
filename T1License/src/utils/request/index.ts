@@ -52,6 +52,21 @@ const transform: AxiosTransform = {
       return data.data;
     }
 
+    const isSuccess = data && code === 200;
+    if (isSuccess) {
+      // 返回data，下面code和sort等一起返回给逻辑层处理
+      /*
+      code: number;
+      message: string;
+      data: Array<CustomerModel>;
+      pagination: any;
+      sort: any;
+      filter: any;
+      errors: any;
+       */
+      return data;
+    }
+
     throw new Error(`请求接口错误, 错误码: ${code}`);
   },
 

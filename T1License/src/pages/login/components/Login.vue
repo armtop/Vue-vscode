@@ -39,7 +39,7 @@
       </div>
     </template>
 
-    <!-- 扫码登录 -->
+    <!-- 扫码登录 
     <template v-else-if="type == 'qrcode'">
       <div class="tip-container">
         <span class="tip">{{ $t('pages.login.wechatLogin') }}</span>
@@ -47,8 +47,9 @@
       </div>
       <qrcode-vue value="" :size="160" level="H" />
     </template>
+    -->
 
-    <!-- 手机号登录 -->
+    <!-- 手机号登录 
     <template v-else>
       <t-form-item name="phone">
         <t-input v-model="formData.phone" size="large" :placeholder="$t('pages.login.input.phone')">
@@ -65,6 +66,7 @@
         </t-button>
       </t-form-item>
     </template>
+    -->
 
     <t-form-item v-if="type !== 'qrcode'" class="btn-container">
       <t-button block size="large" type="submit"> {{ $t('pages.login.signIn') }} </t-button>
@@ -74,10 +76,12 @@
       <span v-if="type !== 'password'" class="tip" @click="switchType('password')">{{
         $t('pages.login.accountLogin')
       }}</span>
+      <!--
       <span v-if="type !== 'qrcode'" class="tip" @click="switchType('qrcode')">{{
         $t('pages.login.wechatLogin')
       }}</span>
       <span v-if="type !== 'phone'" class="tip" @click="switchType('phone')">{{ $t('pages.login.phoneLogin') }}</span>
+      -->
     </div>
   </t-form>
 </template>

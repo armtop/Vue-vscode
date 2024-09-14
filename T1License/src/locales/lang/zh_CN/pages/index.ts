@@ -1,3 +1,4 @@
+import customerlistCard from './customerlist-card';
 import dashboardBase from './dashboard-base';
 import dashboardDetail from './dashboard-detail';
 import detailBase from './detail-base';
@@ -30,4 +31,5 @@ export default {
   user,
   login,
   result,
+  customerlistCard,
 };
