@@ -52,7 +52,9 @@
 <script setup lang="ts">
 import { FormRules, MessagePlugin, SubmitContext } from 'tdesign-vue-next';
 import type { PropType } from 'vue';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
+
+import { getGeneralList } from '@/api/general';
 
 export interface FormData {
   ID: number; // 客户ID
@@ -90,13 +92,20 @@ const INITIAL_DATA: FormData = {
   contactAddress: '',
 };
 
-const SELECT_OPTIONS = [
-  { label: '重要客户', value: '1' },
-  { label: '普通客户', value: '2' },
-  { label: '间接客户', value: '3' },
-  { label: '合作伙伴', value: '4' },
-  { label: '代理商', value: '5' },
-];
+// 替换成API从数据库取值
+const SELECT_OPTIONS = ref([]);
+const fetchData = async () => {
+  try {
+    const { data } = await getGeneralList('customertype');
+    SELECT_OPTIONS.value = data;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+onMounted(() => {
+  fetchData();
+});
 
 const props = defineProps({
   visible: {
@@ -107,7 +116,6 @@ const props = defineProps({
 });
 const formVisible = ref(false);
 const formData = ref({ ...INITIAL_DATA });
-const textareaValue = ref('');
 
 const onSubmit = ({ validateResult, firstError }: SubmitContext) => {
   if (!firstError) {

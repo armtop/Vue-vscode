@@ -387,46 +387,69 @@ export default [
       sort: 'ID,asc',
       filter: 'isSetup,eq,1',
       errors: '',
-      data: {
-        ...Mock.mock({
-          'list|48-50': [
-            {
-              ID: () => `${getNowTime()}`,
-              'name|1': [
-                '腾讯',
-                '阿里',
-                '华为',
-                '百度',
-                '京东',
-                '拼多多',
-                '美团',
-                '哔哩哔哩',
-                '抖音',
-                '快手',
-                '小红书',
-                '拼多多',
-              ],
-              isSetup: '@boolean',
-              'type|1': '@natural(1, 5)',
-              'description|1': [
-                '基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸',
-                '云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗',
-                'SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部',
-                '腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客',
-                '云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。',
-              ],
-              businessLicenseNumber: () => Mock.mock(/\d{15}/).toString(),
-              businessPersonName: () => Mock.mock({ name: '@cname' }).name,
-              businessPersonIdNumber: () => {
-                const idCardNo = Mock.mock(/\d{17}(\d|x)/).toString();
-                return idCardNo;
-              },
-              businessPersonPhoneNumber: () => Mock.mock(/^1\d{11}$/).toString(),
-              contactAddress: () => Mock.mock({ 'address|1': ['@city', '@county(true)', '@city(true)'] }).address,
+      ...Mock.mock({
+        'data|48-50': [
+          {
+            ID: () => `${getNowTime()}`,
+            'name|1': [
+              '腾讯',
+              '阿里',
+              '华为',
+              '百度',
+              '京东',
+              '拼多多',
+              '美团',
+              '哔哩哔哩',
+              '抖音',
+              '快手',
+              '小红书',
+              '拼多多',
+            ],
+            isSetup: '@boolean',
+            'type|1': [
+              { label: '重要客户', value: 1 },
+              { label: '普通客户', value: 2 },
+              { label: '间接客户', value: 3 },
+              { label: '合作伙伴', value: 4 },
+              { label: '代理商', value: 5 },
+            ].map((item) => item.value),
+            'description|1': [
+              '基于腾讯优图强大的面部分析技术，提供包括人脸检测与分析、五官定位、人脸搜索、人脸比对、人脸',
+              '云硬盘为您提供用于CVM的持久性数据块级存储服务。云硬盘中的数据自动地可用区内以多副本冗',
+              'SSL证书又叫服务器证书，腾讯云为您提供证书的一站式服务，包括免费、付费证书的申请、管理及部',
+              '腾讯安全云防火墙产品，是腾讯云安全团队结合云原生的优势，自主研发的SaaS化防火墙产品，无需客无需客无需客无需客无需客无需客无需客',
+              '云数据库MySQL为用户提供安全可靠，性能卓越、易于维护的企业级云数据库服务。',
+            ],
+            businessLicenseNumber: () => Mock.mock(/\d{15}/).toString(),
+            businessPersonName: () => Mock.mock({ name: '@cname' }).name,
+            businessPersonIdNumber: () => {
+              const idCardNo = Mock.mock(/\d{17}(\d|x)/).toString();
+              return idCardNo;
             },
-          ],
-        }),
-      },
+            businessPersonPhoneNumber: () => Mock.mock(/^1\d{11}$/).toString(),
+            contactAddress: () => Mock.mock({ 'address|1': ['@city', '@county(true)', '@city(true)'] }).address,
+          },
+        ],
+      }),
+    }),
+  },
+  {
+    url: '/api/general-list/customertype',
+    method: 'get',
+    response: () => ({
+      code: 200,
+      message: '请求返回成功',
+      pagination: '',
+      sort: 'ID,asc',
+      filter: 'isSetup,eq,1',
+      errors: '',
+      data: [
+        { label: '重要客户', value: 1 },
+        { label: '普通客户', value: 2 },
+        { label: '间接客户', value: 3 },
+        { label: '合作伙伴', value: 4 },
+        { label: '代理商', value: 5 },
+      ],
     }),
   },
 ] as MockMethod[];

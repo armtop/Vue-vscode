@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <dialog-form v-model:bisible="formDialogVisible" :data="formData" />
+    <dialog-form v-model:visible="formDialogVisible" :data="formData" />
 
     <template v-if="pagination.total > 0 && !dataLoading">
       <div class="list-card-items">
@@ -53,7 +53,7 @@
 
     <t-dialog
       v-model:visible="confirmVisible"
-      header="确认删除所选产品？"
+      header="确认删除？"
       :body="confirmBody"
       :on-cancel="onCancel"
       @confirm="onConfirmDelete"
@@ -102,14 +102,12 @@ const dataLoading = ref(true);
 const fetchData = async () => {
   try {
     const result = await getCustomerList();
-    const { list } = result.data; // todo 需要正确获取数组并输出list.length
-    customerList.value = list;
+    const { data } = result;
+    customerList.value = data;
     pagination.value = {
       ...pagination.value,
-      total: list.length,
+      total: data.length,
     };
-    console.log(list);
-    console.log(list.length);
   } catch (e) {
     console.log(e);
   } finally {
