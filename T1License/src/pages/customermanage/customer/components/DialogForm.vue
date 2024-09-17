@@ -1,5 +1,5 @@
 <template>
-  <t-dialog v-model:visible="formVisible" :header="$t('pages.customerlistCard.create')" :width="680" :footer="false">
+  <t-dialog v-model:visible="formVisible" :header="$t('pages.customerlistCard.edit')" :width="680" :footer="false">
     <template #body>
       <!-- 表单内容 -->
       <t-form ref="form" :data="formData" :rules="rules" :label-width="100" @submit="onSubmit">
@@ -119,6 +119,7 @@ const formData = ref({ ...INITIAL_DATA });
 
 const onSubmit = ({ validateResult, firstError }: SubmitContext) => {
   if (!firstError) {
+    // 需要优化代码，调用API保存数据
     MessagePlugin.success('提交成功');
     formVisible.value = false;
   } else {

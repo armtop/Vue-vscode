@@ -1,5 +1,6 @@
 export default {
-  create: 'Create Customer',
+  create: 'create Customer',
+  edit: 'Edit Customer',
   placeholder: 'please enter to search',
   customerID: 'customerID',
   customerName: 'customerName',

@@ -1,5 +1,6 @@
 export default {
-  create: '新建客户',
+  create: '新增客户',
+  edit: '编辑客户',
   placeholder: '请输入查询内容',
   customerID: '客户ID',
   customerName: '客户名称',
