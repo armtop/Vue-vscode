@@ -122,6 +122,7 @@ const onSubmit = ({ validateResult, firstError }: SubmitContext) => {
     // 需要优化代码，调用API保存数据
     MessagePlugin.success('提交成功');
     formVisible.value = false;
+    formData.value = { ...INITIAL_DATA };
   } else {
     console.log('Errors: ', validateResult);
     MessagePlugin.warning(firstError);
