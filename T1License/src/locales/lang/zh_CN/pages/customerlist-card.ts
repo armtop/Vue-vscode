@@ -13,7 +13,7 @@ export default {
   businessPersonPhoneNumber: '营业者手机',
   contactAddress: '联系地址',
   customerisSetupEnum: {
-    off: '注销',
-    on: '激活',
+    off: '停用',
+    on: '启用',
   },
 };

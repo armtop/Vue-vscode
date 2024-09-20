@@ -3,6 +3,7 @@ export default {
     on: '已启用',
     off: '已停用',
   },
+  license: '许可',
   manage: '管理',
   delete: '删除',
   commonTable: {

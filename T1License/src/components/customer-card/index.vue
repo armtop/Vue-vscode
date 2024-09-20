@@ -23,6 +23,7 @@
       <p class="list-card-item_detail--name">{{ customer.name }}</p>
       <p class="list-card-item_detail--id">{{ customer.ID }}</p>
       <p class="list-card-item_detail--desc">{{ customer.businessPersonName }}</p>
+      <p class="list-card-item_detail--desc">{{ customer.businessPersonPhoneNumber }}</p>
       <p class="list-card-item_detail--desc">{{ customer.contactAddress }}</p>
     </template>
     <!-- 定义卡片底部 -->
@@ -42,6 +43,11 @@
         :disabled="false"
         trigger="click"
         :options="[
+          {
+            content: $t('components.license'),
+            value: 'license',
+            onClick: () => handleClickLicense(customer),
+          },
           {
             content: $t('components.manage'),
             value: 'manage',
@@ -97,12 +103,14 @@ const props = defineProps({
 });
 
 // 定义组件的自定义事件
-// 将 defineEmits 函数赋值给一个名为 emit 的常量，这个函数返回一个对象，对象由两个函数组成
-// 第一个函数名为 manage-customer
-// 第二个函数名为 delete-item
-const emit = defineEmits(['manage-customer', 'delete-item']);
+// 将 defineEmits 函数赋值给一个名为 emit 的常量，这样就可以在组件内部使用 emit 函数来触发自定义事件
+const emit = defineEmits(['license-customer', 'manage-customer', 'delete-item']);
 
 const typeMap = ['A', 'B', 'C', 'D', 'E']; // 定义客户类型，如普通客户、重要客户
+
+const handleClickLicense = (customer: CardCustomerType) => {
+  emit('license-customer', customer);
+};
 
 /**
  * 管理客户点击事件处理函数

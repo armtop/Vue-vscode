@@ -65,7 +65,7 @@ import { getGeneralList } from '@/api/general';
 export interface FormData {
   ID: number; // 客户ID
   name: string; // 客户名称
-  isSetup: boolean; // 是否已启用
+  isSetup: string; // 是否已启用
   type: number; // 客户类型
   description: string; // 描述
   businessLicenseNumber: string; // 营业执照注册号
@@ -88,8 +88,8 @@ const randomNumber = `${year}${month}${date}${hour}${minute}${second}${milliseco
 const INITIAL_DATA: FormData = {
   ID: randomNumber,
   name: '',
-  isSetup: false,
-  type: 2,
+  isSetup: '1',
+  type: 1,
   description: '',
   businessLicenseNumber: '',
   businessPersonName: '',

@@ -29,6 +29,7 @@
             <customer-card
               class="list-card-item"
               :customer="customer"
+              @license-customer="handleLicenseCustomer"
               @delete-item="handleDeleteItem"
               @manage-customer="handleManageCustomer"
             />
@@ -71,6 +72,7 @@ export default {
 import { SearchIcon } from 'tdesign-icons-vue-next';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { getCustomerList } from '@/api/customer';
 import type { CardCustomerType } from '@/components/customer-card/index.vue';
@@ -80,9 +82,9 @@ import type { FormData } from './components/DialogForm.vue';
 import DialogForm from './components/DialogForm.vue';
 
 const INITIAL_DATA: FormData = {
-  ID: '',
+  ID: 0,
   name: '',
-  isSetup: false,
+  isSetup: '0',
   type: 2,
   description: '',
   businessLicenseNumber: '',
@@ -94,6 +96,7 @@ const INITIAL_DATA: FormData = {
 
 const pagination = ref({ current: 1, pageSize: 12, total: 0 });
 const deleteCustomer = ref(undefined);
+const router = useRouter();
 
 // const customerList = ref(Array<CustomerModel>);
 const customerList = ref([]);
@@ -158,7 +161,13 @@ const handleManageCustomer = (customer: CardCustomerType) => {
   formData.value = {
     ...INITIAL_DATA,
     ...customer,
+    isSetup: customer.isSetup ? '1' : '0', //  修改为枚举
   };
+};
+
+const handleLicenseCustomer = (customer: CardCustomerType) => {
+  // 跳转到企业许可界面
+  router.push('/detail/base');
 };
 </script>
 <style lang="less" scoped>

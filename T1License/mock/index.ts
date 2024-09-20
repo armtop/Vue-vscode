@@ -405,7 +405,10 @@ export default [
               '小红书',
               '拼多多',
             ],
-            isSetup: '@boolean',
+            isSetup: () => {
+              const random = Math.random();
+              return random < 0.5 ? null : random < 0.8;
+            },
             'type|1': [
               { label: '重要客户', value: 1 },
               { label: '普通客户', value: 2 },
@@ -449,6 +452,24 @@ export default [
         { label: '间接客户', value: 3 },
         { label: '合作伙伴', value: 4 },
         { label: '代理商', value: 5 },
+      ],
+    }),
+  },
+  {
+    url: '/api/general-list/licensetype',
+    method: 'get',
+    response: () => ({
+      code: 200,
+      message: '请求返回成功',
+      pagination: '',
+      sort: 'ID,asc',
+      filter: 'isSetup,eq,1',
+      errors: '',
+      data: [
+        { label: '标准版', value: 1 },
+        { label: '企业版', value: 2 },
+        { label: 'T1yun', value: 3 },
+        { label: 'T1Cloud', value: 4 },
       ],
     }),
   },

@@ -3,6 +3,7 @@ export default {
     on: 'Enabled',
     off: 'Disabled',
   },
+  license: 'License',
   manage: 'Manage',
   delete: 'Delete',
   commonTable: {
