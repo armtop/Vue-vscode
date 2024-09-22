@@ -22,7 +22,7 @@
         </div>
       </t-row>
       <t-table
-        :data="data"
+        :data="licenseList"
         :columns="COLUMNS"
         :row-key="rowKey"
         vertical-align="top"
@@ -35,39 +35,29 @@
         @change="rehandleChange"
         @select-change="(value: number[]) => rehandleSelectChange(value)"
       >
-        <template #status="{ row }">
-          <t-tag v-if="row.status === CONTRACT_STATUS.FAIL" theme="danger" variant="light">
-            {{ $t('pages.licenseManage.contractStatusEnum.fail') }}</t-tag
-          >
-          <t-tag v-if="row.status === CONTRACT_STATUS.AUDIT_PENDING" theme="warning" variant="light">
-            {{ $t('pages.licenseManage.contractStatusEnum.audit') }}
+        <template #licensetype="{ row }">
+          <t-tag v-if="row.licensetype === LICENSE_TYPE.STANDARD.valueOf()" theme="danger" variant="light">
+            {{ $t('pages.licenseManage.licenseTypeEnum.standard') }}
           </t-tag>
-          <t-tag v-if="row.status === CONTRACT_STATUS.EXEC_PENDING" theme="warning" variant="light">
-            {{ $t('pages.licenseManage.contractStatusEnum.pending') }}
+          <t-tag v-if="row.licensetype === LICENSE_TYPE.ENTERPRISE.valueOf()" theme="warning" variant="light">
+            {{ $t('pages.licenseManage.licenseTypeEnum.enterprise') }}
           </t-tag>
-          <t-tag v-if="row.status === CONTRACT_STATUS.EXECUTING" theme="success" variant="light">
-            {{ $t('pages.licenseManage.contractStatusEnum.executing') }}
+          <t-tag v-if="row.licensetype === LICENSE_TYPE.T1YUN.valueOf()" theme="warning" variant="light">
+            {{ $t('pages.licenseManage.licenseTypeEnum.t1cloud') }}
           </t-tag>
-          <t-tag v-if="row.status === CONTRACT_STATUS.FINISH" theme="success" variant="light">
-            {{ $t('pages.licenseManage.contractStatusEnum.finish') }}
+          <t-tag v-if="row.licensetype === LICENSE_TYPE.T1CLOUD.valueOf()" theme="success" variant="light">
+            {{ $t('pages.licenseManage.licenseTypeEnum.t1yun') }}
           </t-tag>
-        </template>
-        <template #contractType="{ row }">
-          <p v-if="row.contractType === CONTRACT_TYPES.MAIN">{{ $t('pages.licenseManage.contractStatusEnum.fail') }}</p>
-          <p v-if="row.contractType === CONTRACT_TYPES.SUB">{{ $t('pages.licenseManage.contractStatusEnum.audit') }}</p>
-          <p v-if="row.contractType === CONTRACT_TYPES.SUPPLEMENT">
-            {{ $t('pages.licenseManage.contractStatusEnum.pending') }}
-          </p>
-        </template>
-        <template #paymentType="{ row }">
-          <div v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.PAYMENT" class="payment-col">
-            {{ $t('pages.licenseManage.pay') }}<trend class="dashboard-item-trend" type="up" />
-          </div>
-          <div v-if="row.paymentType === CONTRACT_PAYMENT_TYPES.RECEIPT" class="payment-col">
-            {{ $t('pages.licenseManage.receive') }}<trend class="dashboard-item-trend" type="down" />
-          </div>
         </template>
 
+        <template #offline="{ row }">
+          <div v-if="row.offline === 0" class="payment-col">
+            {{ $t('pages.licenseManage.offlineEnum.on') }}<trend class="dashboard-item-trend" type="up" />
+          </div>
+          <div v-if="row.offline === 1" class="payment-col">
+            {{ $t('pages.licenseManage.offlineEnum.off') }}<trend class="dashboard-item-trend" type="down" />
+          </div>
+        </template>
         <template #op="slotProps">
           <t-space>
             <t-link theme="primary" @click="handleClickDetail()"> {{ $t('pages.licenseManage.detail') }}</t-link>
@@ -81,7 +71,7 @@
 
     <t-dialog
       v-model:visible="confirmVisible"
-      header="确认删除当前所选合同？"
+      header="确认删除当前所选许可？"
       :body="confirmBody"
       :on-cancel="onCancel"
       @confirm="onConfirmDelete"
@@ -101,10 +91,10 @@ import { MessagePlugin, PrimaryTableCol, TableRowData } from 'tdesign-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { getList } from '@/api/list';
+import { getLicenseList } from '@/api/license';
 import Trend from '@/components/trend/index.vue';
 import { prefix } from '@/config/global';
-import { CONTRACT_PAYMENT_TYPES, CONTRACT_STATUS, CONTRACT_TYPES } from '@/constants';
+import { LICENSE_TYPE } from '@/constants';
 import { t } from '@/locales';
 import { useSettingStore } from '@/store';
 
@@ -113,36 +103,66 @@ const store = useSettingStore();
 const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   { colKey: 'row-select', type: 'multiple', width: 64, fixed: 'left' },
   {
-    title: t('pages.licenseManage.contractName'),
+    title: t('pages.licenseManage.customer'),
     align: 'left',
-    width: 320,
-    colKey: 'name',
+    width: 160,
+    colKey: 'customer',
     fixed: 'left',
   },
-  { title: t('pages.licenseManage.contractStatus'), colKey: 'status', width: 160 },
   {
-    title: t('pages.licenseManage.contractNum'),
-    width: 160,
+    title: t('pages.licenseManage.license'),
+    width: 360,
     ellipsis: true,
-    colKey: 'no',
+    colKey: 'license',
+  },
+  { title: t('pages.licenseManage.licensetype'), colKey: 'licensetype', width: 100 },
+  {
+    title: t('pages.licenseManage.cap'),
+    width: 100,
+    ellipsis: true,
+    colKey: 'cap',
   },
   {
-    title: t('pages.licenseManage.contractType'),
-    width: 160,
+    title: t('pages.licenseManage.offline'),
+    width: 100,
     ellipsis: true,
-    colKey: 'contractType',
+    colKey: 'offline',
   },
   {
-    title: t('pages.licenseManage.contractPayType'),
-    width: 160,
+    title: t('pages.licenseManage.AuthorizationNumber'),
+    width: 100,
     ellipsis: true,
-    colKey: 'paymentType',
+    colKey: 'AuthorizationNumber',
   },
   {
-    title: t('pages.licenseManage.contractAmount'),
+    title: t('pages.licenseManage.AuthorizedDays'),
+    width: 100,
+    ellipsis: true,
+    colKey: 'AuthorizedDays',
+  },
+  {
+    title: t('pages.licenseManage.startDate'),
+    width: 100,
+    ellipsis: true,
+    colKey: 'startDate',
+  },
+  {
+    title: t('pages.licenseManage.machineCode'),
+    width: 320,
+    ellipsis: true,
+    colKey: 'machineCode',
+  },
+  {
+    title: t('pages.licenseManage.ApplicationPackage'),
+    width: 100,
+    ellipsis: true,
+    colKey: 'ApplicationPackage',
+  },
+  {
+    title: t('pages.licenseManage.descr'),
     width: 160,
     ellipsis: true,
-    colKey: 'amount',
+    colKey: 'descr',
   },
   {
     title: t('pages.licenseManage.operation'),
@@ -153,10 +173,10 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   },
 ];
 
-const data = ref([]);
+const licenseList = ref([]);
 const pagination = ref({
-  defaultPageSize: 20,
-  total: 100,
+  defaultPageSize: 10,
+  total: 0, // 优化为通过接口获取记录总条数
   defaultCurrent: 1,
 });
 
@@ -166,11 +186,12 @@ const dataLoading = ref(false);
 const fetchData = async () => {
   dataLoading.value = true;
   try {
-    const { list } = await getList();
-    data.value = list;
+    const result = await getLicenseList();
+    const { data } = result;
+    licenseList.value = data;
     pagination.value = {
       ...pagination.value,
-      total: list.length,
+      total: data.length,
     };
   } catch (e) {
     console.log(e);
@@ -182,8 +203,8 @@ const fetchData = async () => {
 const deleteIdx = ref(-1);
 const confirmBody = computed(() => {
   if (deleteIdx.value > -1) {
-    const { name } = data.value[deleteIdx.value];
-    return `删除后，${name}的所有合同信息将被清空，且无法恢复`;
+    const { name } = licenseList.value[deleteIdx.value];
+    return `删除后，${name}的所有许可信息将被清空，且无法恢复`;
   }
   return '';
 });
@@ -204,8 +225,8 @@ const resetIdx = () => {
 
 const onConfirmDelete = () => {
   // 真实业务请发起请求
-  data.value.splice(deleteIdx.value, 1);
-  pagination.value.total = data.value.length;
+  licenseList.value.splice(deleteIdx.value, 1);
+  pagination.value.total = licenseList.value.length;
   const selectedIdx = selectedRowKeys.value.indexOf(deleteIdx.value);
   if (selectedIdx > -1) {
     selectedRowKeys.value.splice(selectedIdx, 1);
@@ -222,6 +243,7 @@ const onCancel = () => {
 const rowKey = 'index';
 
 const rehandleSelectChange = (val: number[]) => {
+  console.log('多选变化', val);
   selectedRowKeys.value = val;
 };
 const rehandlePageChange = (curr: unknown, pageInfo: unknown) => {

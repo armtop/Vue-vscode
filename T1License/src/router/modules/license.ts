@@ -32,7 +32,7 @@ export default [
       {
         path: 'Addlicense',
         name: 'Addlicense',
-        component: () => import('@/pages/licensemanage/license/components/DialogForm.vue'),
+        component: () => import('@/pages/customermanage/customer/components/DialogForm.vue'),
         meta: {
           title: {
             zh_CN: '编辑许可',

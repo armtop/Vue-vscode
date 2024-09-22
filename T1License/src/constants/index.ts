@@ -1,3 +1,10 @@
+export const LICENSE_TYPE = {
+  STANDARD: 0,
+  ENTERPRISE: 1,
+  T1YUN: 2,
+  T1CLOUD: 3,
+};
+
 // 合同状态枚举
 export const CONTRACT_STATUS = {
   FAIL: 0,

@@ -20,4 +20,5 @@ export default {
   cancel: 'Cancel',
   confirm: 'OK',
   inputlicensetype: 'Please enter a license type',
+  create: 'create',
 };

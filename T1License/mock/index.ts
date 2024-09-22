@@ -385,7 +385,7 @@ export default [
       message: '请求返回成功',
       pagination: '',
       sort: 'ID,asc',
-      filter: 'isSetup,eq,1',
+      filter: 'ID,eq,1',
       errors: '',
       ...Mock.mock({
         'data|48-50': [
@@ -471,6 +471,60 @@ export default [
         { label: 'T1yun', value: 3 },
         { label: 'T1Cloud', value: 4 },
       ],
+    }),
+  },
+  {
+    url: '/api/license-list',
+    method: 'get',
+    response: () => ({
+      code: 200,
+      message: '请求返回成功',
+      pagination: '',
+      sort: 'ID,asc',
+      filter: 'ID,eq,1',
+      errors: '',
+      ...Mock.mock({
+        'data|48-50': [
+          {
+            ID: () => `${getNowTime()}`,
+            'customer|1': [
+              '腾讯',
+              '阿里',
+              '华为',
+              '百度',
+              '京东',
+              '拼多多',
+              '美团',
+              '哔哩哔哩',
+              '抖音',
+              '快手',
+              '小红书',
+              '拼多多',
+            ],
+            license: () => Mock.mock(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/).toString(),
+            'licensetype|1': [
+              { label: 'STANDARD', value: 0 },
+              { label: 'ENTERPRISE', value: 1 },
+              { label: 'T1YUN', value: 2 },
+              { label: 'T1CLOUD', value: 3 },
+            ].map((item) => item.value),
+            cap: () => {
+              const random = Math.random();
+              return random < 0.5 ? null : random < 0.8;
+            },
+            offline: () => {
+              const random = Math.random();
+              return random < 0.5 ? null : random < 0.8;
+            },
+            AuthorizationNumber: () => Mock.mock(/\d{4}/),
+            AuthorizedDays: () => Mock.mock(/\d{4}/),
+            startDate: () => Mock.mock('@date("yyyy-MM-dd")'),
+            machineCode: () => Mock.mock(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/).toString(),
+            ApplicationPackage: '',
+            descr: '',
+          },
+        ],
+      }),
     }),
   },
 ] as MockMethod[];

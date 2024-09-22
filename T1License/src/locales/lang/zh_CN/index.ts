@@ -32,7 +32,7 @@ export default {
       statusOptions: {
         fail: '审核失败',
         auditPending: '待审核',
-        execPending: '待履行',
+        execPending: '履行中',
         executing: '审核成功',
         finish: '已完成',
       },

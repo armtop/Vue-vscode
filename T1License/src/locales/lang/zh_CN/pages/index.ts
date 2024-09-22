@@ -7,6 +7,7 @@ import detailDeploy from './detail-deploy';
 import detailSecondary from './detail-secondary';
 import formBase from './form-base';
 import formStep from './form-step';
+import licenseManage from './license-manage';
 import listBase from './list-base';
 import listCard from './list-card';
 import listFilter from './list-filter';
@@ -32,4 +33,5 @@ export default {
   login,
   result,
   customerlistCard,
+  licenseManage,
 };
