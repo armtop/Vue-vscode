@@ -75,8 +75,8 @@ export interface FormData {
   customer: string; // 客户名称
   license: string; //
   licensetype: number; // license类型
-  cap: boolean; // 开通应用开发
-  offline: boolean; // 离线
+  cap: string; // 开通应用开发
+  offline: string; // 离线
   AuthorizationNumber: number; // 授权数量
   AuthorizedDays: number; // 使用期限
   startDate: string; // 启用日期
@@ -100,8 +100,8 @@ const INITIAL_DATA: FormData = {
   customer: '',
   license: '',
   licensetype: 1,
-  cap: false,
-  offline: false,
+  cap: '0',
+  offline: '0',
   AuthorizationNumber: 0,
   AuthorizedDays: 0,
   startDate: new Date().toString(),

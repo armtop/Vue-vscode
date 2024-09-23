@@ -3,9 +3,7 @@
     <t-card class="list-card-container" :bordered="false">
       <t-row justify="space-between">
         <div class="left-operation-container">
-          <t-button :disabled="!selectedRowKeys.length" @click="handleSetupContract">
-            {{ $t('pages.licenseManage.create') }}
-          </t-button>
+          <t-button @click="formDialogVisible = true">{{ $t('pages.licenseManage.create') }}</t-button>
           <t-button variant="base" theme="default" :disabled="!selectedRowKeys.length">
             {{ $t('pages.licenseManage.export') }}</t-button
           >
@@ -21,6 +19,9 @@
           </t-input>
         </div>
       </t-row>
+
+      <dialog-form v-model:visible="formDialogVisible" :data="formData" />
+
       <t-table
         :data="licenseList"
         :columns="COLUMNS"
@@ -49,13 +50,15 @@
             {{ $t('pages.licenseManage.licenseTypeEnum.t1yun') }}
           </t-tag>
         </template>
+        <template #cap="{ row }">
+          <div v-if="row.cap === 1" class="payment-col">
+            {{ $t('pages.licenseManage.yes') }}
+          </div>
+        </template>
 
         <template #offline="{ row }">
-          <div v-if="row.offline === 0" class="payment-col">
-            {{ $t('pages.licenseManage.offlineEnum.on') }}<trend class="dashboard-item-trend" type="up" />
-          </div>
           <div v-if="row.offline === 1" class="payment-col">
-            {{ $t('pages.licenseManage.offlineEnum.off') }}<trend class="dashboard-item-trend" type="down" />
+            {{ $t('pages.licenseManage.offlineEnum.on') }}<trend class="dashboard-item-trend" type="down" />
           </div>
         </template>
         <template #op="slotProps">
@@ -98,6 +101,9 @@ import { LICENSE_TYPE } from '@/constants';
 import { t } from '@/locales';
 import { useSettingStore } from '@/store';
 
+import type { FormData } from './components/DialogForm.vue';
+import DialogForm from './components/DialogForm.vue';
+
 const store = useSettingStore();
 
 const COLUMNS: PrimaryTableCol<TableRowData>[] = [
@@ -118,19 +124,19 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   { title: t('pages.licenseManage.licensetype'), colKey: 'licensetype', width: 100 },
   {
     title: t('pages.licenseManage.cap'),
-    width: 100,
+    width: 90,
     ellipsis: true,
     colKey: 'cap',
   },
   {
     title: t('pages.licenseManage.offline'),
-    width: 100,
+    width: 90,
     ellipsis: true,
     colKey: 'offline',
   },
   {
     title: t('pages.licenseManage.AuthorizationNumber'),
-    width: 100,
+    width: 110,
     ellipsis: true,
     colKey: 'AuthorizationNumber',
   },
@@ -142,19 +148,19 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   },
   {
     title: t('pages.licenseManage.startDate'),
-    width: 100,
+    width: 120,
     ellipsis: true,
     colKey: 'startDate',
   },
   {
     title: t('pages.licenseManage.machineCode'),
-    width: 320,
+    width: 360,
     ellipsis: true,
     colKey: 'machineCode',
   },
   {
     title: t('pages.licenseManage.ApplicationPackage'),
-    width: 100,
+    width: 120,
     ellipsis: true,
     colKey: 'ApplicationPackage',
   },
@@ -173,10 +179,27 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   },
 ];
 
+const INITIAL_DATA: FormData = {
+  ID: '', // 索引
+  customer: '', // 客户名称
+  license: '', //
+  licensetype: 1, // license类型
+  cap: '0', // 开通应用开发
+  offline: '0', // 离线
+  AuthorizationNumber: 0, // 授权数量
+  AuthorizedDays: 0, // 使用期限
+  startDate: '', // 启用日期
+  machineCode: '', // 机器码
+  ApplicationPackage: '', // 应用包授权
+  descr: '', // 备注
+};
+const formDialogVisible = ref(false);
+const formData = ref({ ...INITIAL_DATA });
+
 const licenseList = ref([]);
 const pagination = ref({
   defaultPageSize: 10,
-  total: 0, // 优化为通过接口获取记录总条数
+  total: 0,
   defaultCurrent: 1,
 });
 

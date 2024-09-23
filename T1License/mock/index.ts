@@ -486,6 +486,7 @@ export default [
       ...Mock.mock({
         'data|48-50': [
           {
+            'index|+1': 1,
             ID: () => `${getNowTime()}`,
             'customer|1': [
               '腾讯',
@@ -510,11 +511,11 @@ export default [
             ].map((item) => item.value),
             cap: () => {
               const random = Math.random();
-              return random < 0.5 ? null : random < 0.8;
+              return random < 0.5 ? 0 : 1;
             },
             offline: () => {
               const random = Math.random();
-              return random < 0.5 ? null : random < 0.8;
+              return random < 0.5 ? 0 : 1;
             },
             AuthorizationNumber: () => Mock.mock(/\d{4}/),
             AuthorizedDays: () => Mock.mock(/\d{4}/),
