@@ -24,19 +24,19 @@ export default [
         component: () => import('@/pages/licensemanage/license/index.vue'),
         meta: {
           title: {
-            zh_CN: '许可',
-            en_US: 'license',
+            zh_CN: '管理',
+            en_US: 'manage',
           },
         },
       },
       {
-        path: 'Addlicense',
-        name: 'Addlicense',
-        component: () => import('@/pages/customermanage/customer/components/DialogForm.vue'),
+        path: 'creation',
+        name: 'creation',
+        component: () => import('@/pages/licensemanage/creation/index.vue'),
         meta: {
           title: {
-            zh_CN: '编辑许可',
-            en_US: 'editlicense',
+            zh_CN: '创建',
+            en_US: 'creation',
           },
         },
       },

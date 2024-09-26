@@ -16,4 +16,11 @@ export default {
     off: 'off',
     on: 'on',
   },
+  customerTypeEnum: {
+    important: 'important',
+    general: 'general',
+    Indirect: 'Indirectvv',
+    partner: 'partner',
+    agent: 'agent',
+  },
 };

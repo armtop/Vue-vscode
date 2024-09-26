@@ -77,6 +77,7 @@ import { useRouter } from 'vue-router';
 import { getCustomerList } from '@/api/customer';
 import type { CardCustomerType } from '@/components/customer-card/index.vue';
 import CustomerCard from '@/components/customer-card/index.vue';
+import { useCustomerStore } from '@/store';
 
 import type { FormData } from './components/DialogForm.vue';
 import DialogForm from './components/DialogForm.vue';
@@ -165,9 +166,14 @@ const handleManageCustomer = (customer: CardCustomerType) => {
   };
 };
 
+const customerStore = useCustomerStore();
 const handleLicenseCustomer = (customer: CardCustomerType) => {
-  // 跳转到企业许可界面
-  router.push('/detail/base');
+  // 情况之前的数据
+  customerStore.clearCustomer();
+  // 保存customer到store
+  customerStore.setCustomer(customer);
+  // 跳转到许可创建界面
+  router.push({ name: 'creation' });
 };
 </script>
 <style lang="less" scoped>

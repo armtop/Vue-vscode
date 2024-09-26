@@ -54,4 +54,6 @@ export default {
   },
   yes: 'yes',
   no: 'no',
+  customerinfo: 'customerinfo',
+  batchDel: 'Batch Delete',
 };

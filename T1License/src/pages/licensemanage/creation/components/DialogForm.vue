@@ -110,7 +110,7 @@ const INITIAL_DATA: FormData = {
   descr: '',
 };
 
-// 替换成API从数据库取值
+// 替换成API从数据库取枚举
 const SELECT_LICENSETYPE = ref([]);
 const fetchData = async () => {
   try {

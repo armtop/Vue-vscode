@@ -54,4 +54,7 @@ export default {
   },
   yes: '是',
   no: '否',
+  customerinfo: '客户信息',
+  batchDel: '批量删除',
+  customerlicense: '客户许可',
 };

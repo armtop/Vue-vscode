@@ -16,4 +16,11 @@ export default {
     off: '停用',
     on: '启用',
   },
+  customerTypeEnum: {
+    important: '重要客户',
+    general: '普通客户',
+    Indirect: '间接客户',
+    partner: '合作伙伴',
+    agent: '代理商',
+  },
 };
