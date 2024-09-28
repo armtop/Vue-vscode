@@ -23,16 +23,7 @@
           <!-- 全局通知 -->
           <notice />
 
-          <t-tooltip placement="bottom" :content="$t('layout.header.code')">
-            <t-button theme="default" shape="square" variant="text" @click="navToGitHub">
-              <t-icon name="logo-github" />
-            </t-button>
-          </t-tooltip>
-          <t-tooltip placement="bottom" :content="$t('layout.header.help')">
-            <t-button theme="default" shape="square" variant="text" @click="navToHelper">
-              <t-icon name="help-circle" />
-            </t-button>
-          </t-tooltip>
+          <t-tooltip placement="bottom" :content="$t('layout.header.code')"> </t-tooltip>
           <t-dropdown trigger="click">
             <t-button theme="default" shape="square" variant="text">
               <translate-icon />

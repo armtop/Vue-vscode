@@ -165,6 +165,7 @@ export default [
       data: {
         ...Mock.mock({
           list: [
+            /*
             {
               path: '/list',
               name: 'list',
@@ -371,7 +372,7 @@ export default [
                   },
                 },
               ],
-            },
+            }, */
           ],
         }),
       },

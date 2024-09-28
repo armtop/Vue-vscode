@@ -19,6 +19,9 @@ const defaultRouterList: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '/dashboard/base',
+    meta: {
+      // requiresAuth: true, // 是否需要登录才能访问
+    },
   },
 ];
 // 存放固定路由
