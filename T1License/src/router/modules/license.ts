@@ -38,6 +38,7 @@ export default [
             zh_CN: '创建',
             en_US: 'creation',
           },
+          hidden: true, // 隐藏在侧边栏菜单中
         },
       },
     ],
