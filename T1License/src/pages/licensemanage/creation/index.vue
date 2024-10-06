@@ -296,7 +296,7 @@ const INITIAL_DATA: FormData = {
   descr: '', // 备注
 };
 
-const selectedRowKeys = ref([1, 2]);
+const selectedRowKeys = ref([]);
 const pagination = ref({
   defaultPageSize: 10,
   total: 0,

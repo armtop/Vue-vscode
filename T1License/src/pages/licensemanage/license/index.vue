@@ -63,7 +63,9 @@
         </template>
         <template #op="slotProps">
           <t-space>
-            <t-link theme="primary" @click="handleClickDetail()"> {{ $t('pages.licenseManage.detail') }}</t-link>
+            <t-link theme="primary" @click="handleClickDetail(slotProps)">
+              {{ $t('pages.licenseManage.detail') }}</t-link
+            >
             <t-link theme="danger" @click="handleClickDelete(slotProps)">
               {{ $t('pages.licenseManage.delete') }}</t-link
             >
@@ -238,7 +240,7 @@ onMounted(() => {
 
 const confirmVisible = ref(false);
 
-const selectedRowKeys = ref([1, 2]);
+const selectedRowKeys = ref([]);
 
 const router = useRouter();
 
@@ -275,12 +277,15 @@ const rehandlePageChange = (curr: unknown, pageInfo: unknown) => {
 const rehandleChange = (changeParams: unknown, triggerAndData: unknown) => {
   console.log('统一Change', changeParams, triggerAndData);
 };
-const handleClickDetail = () => {
-  router.push('/detail/base');
+const handleClickDetail = (row: { row: FormData }) => {
+  formDialogVisible.value = true;
+  formData.value = {
+    ...row.row,
+    cap: row.row.cap ? '1' : '0', //  修改为枚举
+    offline: row.row.offline ? '1' : '0',
+  };
 };
-const handleSetupContract = () => {
-  router.push('/form/base');
-};
+
 const handleClickDelete = (row: { rowIndex: any }) => {
   deleteIdx.value = row.rowIndex;
   confirmVisible.value = true;
