@@ -40,6 +40,7 @@
         </div>
       </t-row>
       <t-table
+        ref="tableRef"
         :data="licenseList"
         :columns="COLUMNS"
         :row-key="rowKey"
@@ -124,6 +125,7 @@ import { useCustomerStore, useSettingStore } from '@/store';
 import type { FormData } from './components/DialogForm.vue';
 import DialogForm from './components/DialogForm.vue';
 
+const tableRef = ref(null);
 const customerStore = useCustomerStore();
 const { customer } = customerStore;
 console.log(customer);
@@ -343,9 +345,16 @@ const onConfirmDelete = () => {
   if (selectedIdx > -1) {
     selectedRowKeys.value.splice(selectedIdx, 1);
   }
+  // 重新计算行索引
+  licenseList.value = licenseList.value.map((item, index) => ({
+    ...item,
+    index: index + 1,
+  }));
   confirmVisible.value = false;
   MessagePlugin.success('删除成功');
   resetIdx();
+  // 刷新表格
+  tableRef.value.refresh();
 };
 
 onMounted(() => {

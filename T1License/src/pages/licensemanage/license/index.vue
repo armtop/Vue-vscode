@@ -228,8 +228,8 @@ const fetchData = async () => {
 const deleteIdx = ref(-1);
 const confirmBody = computed(() => {
   if (deleteIdx.value > -1) {
-    const { name } = licenseList.value[deleteIdx.value];
-    return `删除后，${name}的所有许可信息将被清空，且无法恢复`;
+    const { license } = licenseList.value[deleteIdx.value];
+    return `删除后，${license}的所有许可信息将被清空，且无法恢复`;
   }
   return '';
 });
@@ -259,6 +259,8 @@ const onConfirmDelete = () => {
   confirmVisible.value = false;
   MessagePlugin.success('删除成功');
   resetIdx();
+  // 强制更新licenseList
+  licenseList.value = [...licenseList.value];
 };
 
 const onCancel = () => {
