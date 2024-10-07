@@ -3,7 +3,9 @@
     <div class="list-card-operation">
       <t-button @click="formDialogVisible = true">{{ $t('pages.customerlistCard.create') }}</t-button>
       <div class="search-input">
-        <t-input v-model="searchValue" :placeholder="$t('pages.customerlistCard.placeholder')" clearable>
+        <t-input v-model="searchValue" :placeholder="$t('pages.customerlistCard.placeholder')" clearable
+        @input="handleSearch"
+        @clear="resetSearch">
           <template #suffix-icon>
             <search-icon v-if="searchValue === ''" size="var(--td-comp-size-xxxs)" />
           </template>
@@ -119,6 +121,26 @@ const fetchData = async () => {
   }
 };
 
+const handleSearch = () => {
+  console.log(searchValue.value.trim()); // 添加日志以确认函数被调用
+  if (searchValue.value.trim() === '') {
+    fetchData();
+  } else {
+    customerList.value = customerList.value.filter(customer => 
+      customer.name.toLowerCase().includes(searchValue.value.toLowerCase()) ||
+      customer.description.toLowerCase().includes(searchValue.value.toLowerCase())
+    );
+  }
+  pagination.value.current = 1;
+  pagination.value.total = customerList.value.length;
+};
+
+const resetSearch = () => {
+  fetchData();
+  pagination.value.current = 1;
+  pagination.value.total = customerList.value.length;
+};
+
 const confirmBody = computed(() =>
   deleteCustomer.value ? `确认删除后${deleteCustomer.value.name}的所有信息将被清空, 且无法恢复` : '',
 );
@@ -146,10 +168,18 @@ const handleDeleteItem = (customer: CardCustomerType) => {
 };
 
 const onConfirmDelete = () => {
-  const { index } = deleteCustomer.value;
-  customerList.value.splice(index - 1, 1);
-  confirmVisible.value = false;
-  MessagePlugin.success('删除成功');
+  const { ID } = deleteCustomer.value;
+  const initialLength = customerList.value.length;  
+  customerList.value = customerList.value.filter(customer => customer.ID !== ID);  
+  if (customerList.value.length < initialLength) {
+    confirmVisible.value = false;
+    MessagePlugin.success('删除成功');    
+  } else {
+    MessagePlugin.error('未找到要删除的客户');
+  }
+  // 更新分页信息
+  pagination.value.total = customerList.value.length;
+  pagination.value.current = 1;
 };
 
 const onCancel = () => {

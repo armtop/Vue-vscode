@@ -12,7 +12,9 @@
           </p>
         </div>
         <div class="search-input">
-          <t-input v-model="searchValue" :placeholder="$t('pages.licenseManage.placeholder')" clearable>
+          <t-input v-model="searchValue" :placeholder="$t('pages.licenseManage.placeholder')" clearable
+          @input="handleSearch"
+          @clear="resetSearch">
             <template #suffix-icon>
               <search-icon size="16px" />
             </template>
@@ -265,6 +267,26 @@ const onConfirmDelete = () => {
 
 const onCancel = () => {
   resetIdx();
+};
+
+const handleSearch = () => {
+  console.log(searchValue.value.trim()); // 添加日志以确认函数被调用
+  if (searchValue.value.trim() === '') {
+    fetchData();
+  } else {
+    licenseList.value = licenseList.value.filter(license => 
+      license.customer.toLowerCase().includes(searchValue.value.toLowerCase()) ||
+      license.descr.toLowerCase().includes(searchValue.value.toLowerCase())
+    );
+  }
+  pagination.value.defaultCurrent = 1;
+  pagination.value.total = licenseList.value.length;
+};
+
+const resetSearch = () => {
+  fetchData();
+  pagination.value.defaultCurrent = 1;
+  pagination.value.total = licenseList.value.length;
 };
 
 const rowKey = 'index';
