@@ -4,7 +4,7 @@
       <t-row justify="space-between">
         <div class="left-operation-container">
           <t-button @click="formDialogVisible = true">{{ $t('pages.licenseManage.create') }}</t-button>
-          <t-button variant="base" theme="default" :disabled="!selectedRowKeys.length">
+          <t-button variant="base" theme="default" :disabled="!selectedRowKeys.length" @click="handleBatchDelete">
             {{ $t('pages.licenseManage.batchDel') }}
           </t-button>
           <p v-if="!!selectedRowKeys.length" class="selected-count">
@@ -78,7 +78,7 @@
 
     <t-dialog
       v-model:visible="confirmVisible"
-      header="确认删除当前所选许可？"
+      header="confirmHeader"
       :body="confirmBody"
       :on-cancel="onCancel"
       @confirm="onConfirmDelete"
@@ -109,7 +109,7 @@ import type { FormData } from '../creation/components/DialogForm.vue';
 import DialogForm from '../creation/components/DialogForm.vue';
 
 const store = useSettingStore();
-
+const confirmHeader = ref('确认删除');
 const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   { colKey: 'row-select', type: 'multiple', width: 64, fixed: 'left' },
   {
@@ -233,6 +233,9 @@ const confirmBody = computed(() => {
     const { license } = licenseList.value[deleteIdx.value];
     return `删除后，${license}的所有许可信息将被清空，且无法恢复`;
   }
+  if (selectedRowKeys.value.length > 0) {
+    return `确认删除选中的 ${selectedRowKeys.value.length} 条记录吗？此操作不可恢复。`;
+  }
   return '';
 });
 
@@ -252,17 +255,31 @@ const resetIdx = () => {
 
 const onConfirmDelete = () => {
   // 真实业务请发起请求
-  licenseList.value.splice(deleteIdx.value, 1);
-  pagination.value.total = licenseList.value.length;
-  const selectedIdx = selectedRowKeys.value.indexOf(deleteIdx.value);
-  if (selectedIdx > -1) {
-    selectedRowKeys.value.splice(selectedIdx, 1);
+  if (deleteIdx.value > -1) {
+    // 单条删除逻辑
+    licenseList.value.splice(deleteIdx.value, 1);
+  } else {
+    // 批量删除逻辑
+    licenseList.value = licenseList.value.filter(item => !selectedRowKeys.value.includes(item[rowKey]));
   }
+  
+  // 更新分页信息
+  pagination.value.total = licenseList.value.length;
+  
+  // 清空选中状态
+  selectedRowKeys.value = [];
+  
   confirmVisible.value = false;
   MessagePlugin.success('删除成功');
   resetIdx();
+  
   // 强制更新licenseList
   licenseList.value = [...licenseList.value];
+};
+
+const handleBatchDelete = () => {
+  confirmHeader.value = '确认批量删除';
+  confirmVisible.value = true;
 };
 
 const onCancel = () => {
@@ -289,7 +306,7 @@ const resetSearch = () => {
   pagination.value.total = licenseList.value.length;
 };
 
-const rowKey = 'index';
+const rowKey = 'ID';
 
 const rehandleSelectChange = (val: number[]) => {
   console.log('多选变化', val);
