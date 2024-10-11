@@ -3,9 +3,13 @@
     <div class="list-card-operation">
       <t-button @click="formDialogVisible = true">{{ $t('pages.customerlistCard.create') }}</t-button>
       <div class="search-input">
-        <t-input v-model="searchValue" :placeholder="$t('pages.customerlistCard.placeholder')" clearable
-        @input="handleSearch"
-        @clear="resetSearch">
+        <t-input
+          v-model="searchValue"
+          :placeholder="$t('pages.customerlistCard.placeholder')"
+          clearable
+          @input="handleSearch"
+          @clear="resetSearch"
+        >
           <template #suffix-icon>
             <search-icon v-if="searchValue === ''" size="var(--td-comp-size-xxxs)" />
           </template>
@@ -85,7 +89,7 @@ import type { FormData } from './components/DialogForm.vue';
 import DialogForm from './components/DialogForm.vue';
 
 const INITIAL_DATA: FormData = {
-  ID: 0,
+  ID: '0',
   name: '',
   isSetup: '0',
   type: 2,
@@ -126,9 +130,10 @@ const handleSearch = () => {
   if (searchValue.value.trim() === '') {
     fetchData();
   } else {
-    customerList.value = customerList.value.filter(customer => 
-      customer.name.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-      customer.description.toLowerCase().includes(searchValue.value.toLowerCase())
+    customerList.value = customerList.value.filter(
+      (customer) =>
+        customer.name.toLowerCase().includes(searchValue.value.toLowerCase()) ||
+        customer.description.toLowerCase().includes(searchValue.value.toLowerCase()),
     );
   }
   pagination.value.current = 1;
@@ -169,11 +174,11 @@ const handleDeleteItem = (customer: CardCustomerType) => {
 
 const onConfirmDelete = () => {
   const { ID } = deleteCustomer.value;
-  const initialLength = customerList.value.length;  
-  customerList.value = customerList.value.filter(customer => customer.ID !== ID);  
+  const initialLength = customerList.value.length;
+  customerList.value = customerList.value.filter((customer) => customer.ID !== ID);
   if (customerList.value.length < initialLength) {
     confirmVisible.value = false;
-    MessagePlugin.success('删除成功');    
+    MessagePlugin.success('删除成功');
   } else {
     MessagePlugin.error('未找到要删除的客户');
   }
@@ -193,6 +198,7 @@ const handleManageCustomer = (customer: CardCustomerType) => {
     ...INITIAL_DATA,
     ...customer,
     isSetup: customer.isSetup ? '1' : '0', //  修改为枚举
+    ID: customer.ID.toString(), // 将 ID 转换为字符串
   };
 };
 

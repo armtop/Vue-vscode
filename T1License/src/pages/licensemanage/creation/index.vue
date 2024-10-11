@@ -6,11 +6,12 @@
         <t-descriptions-item v-for="(item, index) in CUSTOMER_DATA" :key="index" :label="item.name">
           <span
             :class="{
-              ['inProgress']: item.type && item.type.value === 'inProgress',
-              ['pdf']: item.type && item.type.value === 'pdf',
+              ['inProgress']:
+                typeof item.type === 'object' ? item.type.value === 'inProgress' : item.type === 'inProgress',
+              ['pdf']: typeof item.type === 'object' ? item.type.value === 'pdf' : item.type === 'pdf',
             }"
           >
-            <i v-if="item.type && item.type.key === 'contractStatus'" />
+            <i v-if="typeof item.type === 'object' && item.type?.key === 'contractStatus'" />
             {{ item.value }}
           </span>
         </t-descriptions-item>
@@ -142,7 +143,7 @@ const CUSTOMER_DATA = [
   {
     name: t('pages.customerlistCard.customerID'),
     value: customer.ID,
-    type: null,
+    type: null as string | null,
   },
   {
     name: t('pages.customerlistCard.customerName'),

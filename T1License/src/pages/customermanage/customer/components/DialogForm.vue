@@ -63,7 +63,7 @@ import { onMounted, ref, watch } from 'vue';
 import { getGeneralList } from '@/api/general';
 
 export interface FormData {
-  ID: number; // 客户ID
+  ID: string; // 客户ID
   name: string; // 客户名称
   isSetup: string; // 是否已启用
   type: number; // 客户类型
