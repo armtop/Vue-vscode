@@ -6,9 +6,8 @@
         <t-descriptions-item v-for="(item, index) in CUSTOMER_DATA" :key="index" :label="item.name">
           <span
             :class="{
-              ['inProgress']:
-                typeof item.type === 'object' ? item.type.value === 'inProgress' : item.type === 'inProgress',
-              ['pdf']: typeof item.type === 'object' ? item.type.value === 'pdf' : item.type === 'pdf',
+              ['inProgress']: item.type && typeof item.type === 'object' && item.type.value === 'inProgress',
+              ['pdf']: item.type && typeof item.type === 'object' && item.type.value === 'pdf',
             }"
           >
             <i v-if="typeof item.type === 'object' && item.type?.key === 'contractStatus'" />

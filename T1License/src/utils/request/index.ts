@@ -13,14 +13,13 @@ import { formatRequestDate, joinTimestamp, setObjToUrlParams } from './utils';
 const env = import.meta.env.MODE || 'development';
 
 // 如果是mock模式 或 没启用直连代理 就不配置host 会走本地Mock拦截 或 Vite 代理
-let host = env === 'mock' || import.meta.env.VITE_IS_REQUEST_PROXY !== 'true' ? '' : import.meta.env.VITE_API_URL;
-if (env === 'release') {
-  host = import.meta.env.VITE_API_URL;
-}
+const host = env === 'mock' || import.meta.env.VITE_IS_REQUEST_PROXY !== 'true' ? '' : import.meta.env.VITE_API_URL;
+// 输出日志
 console.log('VITE_IS_REQUEST_PROXY:', import.meta.env.VITE_IS_REQUEST_PROXY);
 console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
 console.log('env:', env);
 console.log('host:', host);
+
 // 数据处理，方便区分多种处理方式
 const transform: AxiosTransform = {
   // 处理请求数据。如果数据不是预期格式，可直接抛出错误
