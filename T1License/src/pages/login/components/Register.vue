@@ -54,19 +54,20 @@
     </template>
 
     <t-form-item class="check-container" name="checked">
-      <t-checkbox v-model="formData.checked">我已阅读并同意 </t-checkbox> <span>TDesign服务协议</span> 和
-      <span>TDesign 隐私声明</span>
+      <t-checkbox v-model="formData.checked">我已阅读并同意 </t-checkbox> <span>T1Yun服务协议</span> 和
+      <span>T1Yun 隐私声明</span>
     </t-form-item>
 
     <t-form-item>
       <t-button block size="large" type="submit"> 注册 </t-button>
     </t-form-item>
-
+    <!--
     <div class="switch-container">
       <span class="tip" @click="switchType(type == 'phone' ? 'email' : 'phone')">{{
         type == 'phone' ? '使用邮箱注册' : '使用手机号注册'
       }}</span>
     </div>
+-->
   </t-form>
 </template>
 
@@ -74,8 +75,13 @@
 import type { FormRule, SubmitContext } from 'tdesign-vue-next';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+import { T1Register } from '@/api/user';
 import { useCounter } from '@/hooks';
+import { ApiStatusCode } from '@/types/api';
+import { handleApiResponse } from '@/utils/apiHelper';
+import { cryptoUtils } from '@/utils/crypto';
 
 const INITIAL_DATA = {
   phone: '',
@@ -91,12 +97,21 @@ const FORM_RULES: Record<string, FormRule[]> = {
     { required: true, message: '邮箱必填', type: 'error' },
     { email: true, message: '请输入正确的邮箱', type: 'warning' },
   ],
-  password: [{ required: true, message: '密码必填', type: 'error' }],
+  password: [
+    { required: true, message: '密码必填', type: 'error' },
+    {
+      validator: (val) => {
+        return val.length >= 8 && /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
+      },
+      message: '密码至少8位，必须包含大小写字母和数字',
+      type: 'warning',
+    },
+  ],
   verifyCode: [{ required: true, message: '验证码必填', type: 'error' }],
 };
 
-const type = ref('phone');
-
+const type = ref('email');
+const router = useRouter();
 const form = ref();
 const formData = ref({ ...INITIAL_DATA });
 
@@ -106,14 +121,51 @@ const [countDown, handleCounter] = useCounter();
 
 const emit = defineEmits(['registerSuccess']);
 
-const onSubmit = (ctx: SubmitContext) => {
+const onSubmit = async (ctx: SubmitContext) => {
   if (ctx.validateResult === true) {
     if (!formData.value.checked) {
-      MessagePlugin.error('请同意TDesign服务协议和TDesign 隐私声明');
+      MessagePlugin.error('请同意服务协议和隐私声明');
       return;
     }
-    MessagePlugin.success('注册成功');
-    emit('registerSuccess');
+
+    try {
+      // 第一次加密密码
+      const firstHash = cryptoUtils.generateFirstHash(formData.value.password);
+
+      const handleRegister = async () => {
+        const response = await T1Register({
+          account: formData.value.email,
+          password: firstHash,
+        });
+
+        return response;
+      };
+
+      const res = await handleRegister();
+
+      handleApiResponse(res, {
+        onSuccess: (data) => {
+          console.log('请求成功', data);
+          MessagePlugin.success('请登录注册邮箱激活账号');
+          emit('registerSuccess');
+        },
+        onError: (error) => {
+          console.error('请求失败', error?.errorMessage);
+          throw res;
+        },
+        onSpecificError: {
+          [ApiStatusCode.TokenExpired]: () => {
+            // 处理token过期
+            router.push('/login');
+          },
+          [ApiStatusCode.Unauthorized]: () => {
+            // 处理未授权
+          },
+        },
+      });
+    } catch (error) {
+      MessagePlugin.error('注册失败，请重试');
+    }
   }
 };
 

@@ -9,7 +9,7 @@
   >
     <template v-if="type == 'password'">
       <t-form-item name="account">
-        <t-input v-model="formData.account" size="large" :placeholder="`${$t('pages.login.input.account')}：admin`">
+        <t-input v-model="formData.account" size="large" :placeholder="`${$t('pages.login.input.account')}`">
           <template #prefix-icon>
             <t-icon name="user" />
           </template>
@@ -22,7 +22,7 @@
           size="large"
           :type="showPsw ? 'text' : 'password'"
           clearable
-          :placeholder="`${$t('pages.login.input.password')}：admin`"
+          :placeholder="`${$t('pages.login.input.password')}`"
         >
           <template #prefix-icon>
             <t-icon name="lock-on" />
@@ -93,16 +93,20 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { T1GetSalt } from '@/api/user';
 import { useCounter } from '@/hooks';
 import { t } from '@/locales';
 import { useUserStore } from '@/store';
+import { ApiStatusCode } from '@/types/api';
+import { handleApiResponse } from '@/utils/apiHelper';
+import { cryptoUtils } from '@/utils/crypto';
 
 const userStore = useUserStore();
 
 const INITIAL_DATA = {
   phone: '',
-  account: 'admin',
-  password: 'admin',
+  account: '',
+  password: '',
   verifyCode: '',
   checked: false,
 };
@@ -131,7 +135,7 @@ const route = useRoute();
 
 /**
  * 发送验证码
- */
+ 
 const sendCode = () => {
   form.value.validate({ fields: ['phone'] }).then((e) => {
     if (e === true) {
@@ -139,10 +143,15 @@ const sendCode = () => {
     }
   });
 };
-
+*/
 const onSubmit = async (ctx: SubmitContext) => {
   if (ctx.validateResult === true) {
     try {
+      //  第一次加密密码
+      const firstHash = cryptoUtils.generateFirstHash(formData.value.password);
+
+      formData.value.password = firstHash;
+
       await userStore.login(formData.value);
 
       MessagePlugin.success('登录成功');

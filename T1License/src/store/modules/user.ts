@@ -1,11 +1,20 @@
 import { defineStore } from 'pinia';
+import { useRouter } from 'vue-router';
 
+// import { ref } from 'vue';
+import { T1login } from '@/api/user';
 import { usePermissionStore } from '@/store';
+// import type { ApiResponse } from '@/types/api';
+import { ApiStatusCode } from '@/types/api';
 import type { UserInfo } from '@/types/interface';
+import { handleApiResponse } from '@/utils/apiHelper';
 
+const router = useRouter();
+// const apiResponse = ref<ApiResponse<UserInfo>>();
 const InitUserInfo: UserInfo = {
   name: '', // 用户名，用于展示在页面右上角头像处
   roles: [], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
+  isAdmin: false,
 };
 
 export const useUserStore = defineStore('user', {
@@ -20,56 +29,70 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     async login(userInfo: Record<string, unknown>) {
-      const mockLogin = async (userInfo: Record<string, unknown>) => {
-        // 登录请求流程
-        console.log(`用户信息:`, userInfo);
-        // const { account, password } = userInfo;
-        // if (account !== 'td') {
-        //   return {
-        //     code: 401,
-        //     message: '账号不存在',
-        //   };
-        // }
-        // if (['main_', 'dev_'].indexOf(password) === -1) {
-        //   return {
-        //     code: 401,
-        //     message: '密码错误',
-        //   };
-        // }
-        // const token = {
-        //   main_: 'main_token',
-        //   dev_: 'dev_token',
-        // }[password];
-        return {
-          code: 200,
-          message: '登录成功',
-          data: 'main_token',
-        };
+      const handleLogin = async (userInfo: Record<string, unknown>) => {
+        const response = await T1login({
+          account: userInfo.account as string,
+          password: userInfo.password as string,
+        });
+
+        return response;
       };
 
-      const res = await mockLogin(userInfo);
-      if (res.code === 200) {
-        this.token = res.data;
-      } else {
-        throw res;
-      }
+      const res = await handleLogin(userInfo);
+
+      handleApiResponse(res, {
+        onSuccess: (data) => {
+          console.log('请求成功', data);
+          this.token = res.data.token;
+          this.userInfo.isAdmin = res.data.isAdmin;
+          this.userInfo.name = res.data.account;
+        },
+        onError: (error) => {
+          console.error('请求失败', error?.errorMessage);
+          throw res;
+        },
+        onSpecificError: {
+          [ApiStatusCode.TokenExpired]: () => {
+            // 处理token过期
+            router.push('/login');
+          },
+          [ApiStatusCode.Unauthorized]: () => {
+            // 处理未授权
+          },
+        },
+      });
     },
     async getUserInfo() {
+      // 获取用户名、角色等
+      /*
       const mockRemoteUserInfo = async (token: string) => {
         if (token === 'main_token') {
           return {
             name: 'Tencent',
-            roles: ['all'], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
+            roles: ['all'], // 前端权限模型使用 如果使用请配置store/modules/permission-fe.ts使用
           };
         }
         return {
           name: 'td_dev',
-          roles: ['UserIndex', 'DashboardBase', 'login'], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
+          roles: ['UserIndex', 'DashboardBase', 'login'], // 前端权限模型使用 如果使用请配store/modules/permission-fe.ts使用
         };
       };
       const res = await mockRemoteUserInfo(this.token);
+      */
+      const remoteUserInfo = async () => {
+        if (this.userInfo.isAdmin) {
+          return {
+            name: this.userInfo.name,
+            roles: ['all'],
+          };
+        }
+        return {
+          name: this.userInfo.name,
+          roles: ['DashboardBase'],
+        };
+      };
 
-      this.userInfo = res;
+      const res = await remoteUserInfo();
     },
     async logout() {
       this.token = '';

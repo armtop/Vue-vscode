@@ -20,7 +20,7 @@ const defaultRouterList: Array<RouteRecordRaw> = [
     path: '/',
     redirect: '/dashboard/base',
     meta: {
-      // requiresAuth: true, // 是否需要登录才能访问
+      requiresAuth: true, // 是否需要登录才能访问
     },
   },
 ];

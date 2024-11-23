@@ -1,0 +1,26 @@
+export interface UserInfo {
+  Id: string;
+  Itemcode: string;
+  Itemname: string;
+  Account: string;
+  Password: string;
+  Createdate: string;
+  Updatedate: string;
+  Disable: boolean;
+  IsEmailConfirmed: boolean;
+  ActivationCode: string;
+  IsAdmin: boolean;
+  LastLoginAt: string;
+}
+
+export interface LoginParams {
+  account: string;
+  password: string;
+}
+
+export interface LoginResult {
+  account: string;
+  token: string;
+  isAdmin: boolean;
+  role: string[];
+}
