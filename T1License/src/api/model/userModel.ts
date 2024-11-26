@@ -24,3 +24,8 @@ export interface LoginResult {
   isAdmin: boolean;
   role: string[];
 }
+
+export interface ResetPasswdParams {
+  account: string;
+  newPassword: string;
+}

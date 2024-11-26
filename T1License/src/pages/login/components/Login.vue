@@ -35,8 +35,35 @@
 
       <div class="check-container remember-pwd">
         <t-checkbox>{{ $t('pages.login.remember') }}</t-checkbox>
-        <span class="tip">{{ $t('pages.login.forget') }}</span>
+        <span class="tip" @click="switchType('forget')">{{ $t('pages.login.forget') }}</span>
       </div>
+    </template>
+
+    <template v-else-if="type === 'forget'">
+      <t-form-item name="account">
+        <t-input v-model="formData.account" size="large" :placeholder="'请输入账号'">
+          <template #prefix-icon>
+            <t-icon name="user" />
+          </template>
+        </t-input>
+      </t-form-item>
+
+      <t-form-item name="password">
+        <t-input
+          v-model="formData.password"
+          size="large"
+          :type="showPsw ? 'text' : 'password'"
+          clearable
+          placeholder="请输入新密码"
+        >
+          <template #prefix-icon>
+            <t-icon name="lock-on" />
+          </template>
+          <template #suffix-icon>
+            <t-icon :name="showPsw ? 'browse' : 'browse-off'" @click="showPsw = !showPsw" />
+          </template>
+        </t-input>
+      </t-form-item>
     </template>
 
     <!-- 扫码登录 
@@ -69,7 +96,9 @@
     -->
 
     <t-form-item v-if="type !== 'qrcode'" class="btn-container">
-      <t-button block size="large" type="submit"> {{ $t('pages.login.signIn') }} </t-button>
+      <t-button block size="large" type="submit">
+        {{ type === 'forget' ? '重置密码' : $t('pages.login.signIn') }}
+      </t-button>
     </t-form-item>
 
     <div class="switch-container">
@@ -93,7 +122,7 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { T1GetSalt } from '@/api/user';
+import { T1RestPasswd } from '@/api/user';
 import { useCounter } from '@/hooks';
 import { t } from '@/locales';
 import { useUserStore } from '@/store';
@@ -113,8 +142,22 @@ const INITIAL_DATA = {
 
 const FORM_RULES: Record<string, FormRule[]> = {
   phone: [{ required: true, message: t('pages.login.required.phone'), type: 'error' }],
-  account: [{ required: true, message: t('pages.login.required.account'), type: 'error' }],
-  password: [{ required: true, message: t('pages.login.required.password'), type: 'error' }],
+  // account: [{ required: true, message: t('pages.login.required.account'), type: 'error' }],
+  account: [
+    { required: true, message: '邮箱必填', type: 'error' },
+    { email: true, message: '请输入正确的邮箱', type: 'warning' },
+  ],
+  // password: [{ required: true, message: t('pages.login.required.password'), type: 'error' }],
+  password: [
+    { required: true, message: '密码必填', type: 'error' },
+    {
+      validator: (val) => {
+        return val.length >= 8 && /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
+      },
+      message: '密码至少8位，必须包含大小写字母和数字',
+      type: 'warning',
+    },
+  ],
   verifyCode: [{ required: true, message: t('pages.login.required.verification'), type: 'error' }],
 };
 
@@ -147,17 +190,54 @@ const sendCode = () => {
 const onSubmit = async (ctx: SubmitContext) => {
   if (ctx.validateResult === true) {
     try {
-      //  第一次加密密码
-      const firstHash = cryptoUtils.generateFirstHash(formData.value.password);
+      if (type.value === 'forget') {
+        // 第一次加密密码
+        const firstHash = cryptoUtils.generateFirstHash(formData.value.password);
+        // 调用重置密码API
+        const handleResetPasswd = async () => {
+          const response = await T1RestPasswd({
+            account: formData.value.account,
+            newPassword: firstHash,
+          });
 
-      formData.value.password = firstHash;
+          return response;
+        };
 
-      await userStore.login(formData.value);
+        const res = await handleResetPasswd();
 
-      MessagePlugin.success('登录成功');
-      const redirect = route.query.redirect as string;
-      const redirectUrl = redirect ? decodeURIComponent(redirect) : '/dashboard';
-      router.push(redirectUrl);
+        handleApiResponse(res, {
+          onSuccess: (data) => {
+            MessagePlugin.success('请登录邮箱激活新密码');
+            switchType('password');
+            formData.value = { ...INITIAL_DATA };
+          },
+          onError: (error) => {
+            console.error('请求失败', error?.errorMessage);
+            throw res;
+          },
+          onSpecificError: {
+            [ApiStatusCode.TokenExpired]: () => {
+              // 处理token过期
+              router.push('/login');
+            },
+            [ApiStatusCode.Unauthorized]: () => {
+              // 处理未授权
+            },
+          },
+        });
+      } else {
+        //  第一次加密密码
+        const firstHash = cryptoUtils.generateFirstHash(formData.value.password);
+
+        formData.value.password = firstHash;
+
+        await userStore.login(formData.value);
+
+        MessagePlugin.success('登录成功');
+        const redirect = route.query.redirect as string;
+        const redirectUrl = redirect ? decodeURIComponent(redirect) : '/dashboard';
+        router.push(redirectUrl);
+      }
     } catch (e) {
       console.log(e);
       MessagePlugin.error(e.message);
