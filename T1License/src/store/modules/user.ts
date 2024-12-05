@@ -13,6 +13,15 @@ const router = useRouter();
 // const apiResponse = ref<ApiResponse<UserInfo>>();
 const InitUserInfo: UserInfo = {
   name: '', // 用户名，用于展示在页面右上角头像处
+  itemcode: '',
+  itemname: '',
+  createdate: '',
+  updatedate: '',
+  disable: false,
+  isemailconfirmed: false,
+  activationcode: '',
+  isadmin: false,
+  lastloginat: '',
   roles: [], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
   isAdmin: false,
 };
@@ -46,6 +55,15 @@ export const useUserStore = defineStore('user', {
           this.token = res.data.token;
           this.userInfo.isAdmin = res.data.isAdmin;
           this.userInfo.name = res.data.account;
+          this.userInfo.itemcode = res.data.itemCode;
+          this.userInfo.itemname = res.data.itemName;
+          this.userInfo.createdate = res.data.createDate;
+          this.userInfo.updatedate = res.data.updateDate;
+          this.userInfo.disable = res.data.disable;
+          this.userInfo.isemailconfirmed = res.data.isEmailConfirmed;
+          this.userInfo.activationcode = res.data.activationCode;
+          this.userInfo.lastloginat = res.data.lastLoginAt;
+          this.getUserInfo();
         },
         onError: (error) => {
           console.error('请求失败', error?.errorMessage);
@@ -105,6 +123,6 @@ export const useUserStore = defineStore('user', {
       permissionStore.initRoutes();
     },
     key: 'user',
-    paths: ['token'],
+    paths: ['token', 'userInfo'], // 同时持久化token和userInfo
   },
 });

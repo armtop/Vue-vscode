@@ -164,7 +164,7 @@ const onSubmit = async (ctx: SubmitContext) => {
         },
       });
     } catch (error) {
-      MessagePlugin.error('注册失败，请重试');
+      MessagePlugin.error(error?.message);
     }
   }
 };

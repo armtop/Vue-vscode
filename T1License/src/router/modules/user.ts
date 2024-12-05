@@ -12,7 +12,7 @@ export default [
     meta: {
       title: { zh_CN: '个人中心', en_US: 'User Center' },
       icon: 'user-circle',
-      hidden: true, // 隐藏在侧边栏菜单中的第一级菜单
+      hidden: false, // 隐藏在侧边栏菜单中的第一级菜单
     },
     children: [
       {

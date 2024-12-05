@@ -32,6 +32,15 @@ export type ModeType = 'dark' | 'light';
 
 export interface UserInfo {
   name: string;
+  itemcode: string;
+  itemname: string;
+  createdate: string;
+  updatedate: string;
+  disable: boolean;
+  isemailconfirmed: boolean;
+  activationcode: string;
+  isadmin: boolean;
+  lastloginat: string;
   roles: string[];
   isAdmin: boolean;
 }

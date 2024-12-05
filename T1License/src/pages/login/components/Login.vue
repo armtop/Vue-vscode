@@ -34,7 +34,7 @@
       </t-form-item>
 
       <div class="check-container remember-pwd">
-        <t-checkbox>{{ $t('pages.login.remember') }}</t-checkbox>
+        <!--<t-checkbox>{{ $t('pages.login.remember') }}</t-checkbox>-->
         <span class="tip" @click="switchType('forget')">{{ $t('pages.login.forget') }}</span>
       </div>
     </template>
@@ -229,9 +229,12 @@ const onSubmit = async (ctx: SubmitContext) => {
         //  第一次加密密码
         const firstHash = cryptoUtils.generateFirstHash(formData.value.password);
 
-        formData.value.password = firstHash;
+        const userInfo: Record<string, unknown> = {
+          account: formData.value.account,
+          password: firstHash,
+        };
 
-        await userStore.login(formData.value);
+        await userStore.login(userInfo);
 
         MessagePlugin.success('登录成功');
         const redirect = route.query.redirect as string;

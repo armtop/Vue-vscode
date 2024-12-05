@@ -3,7 +3,6 @@ export interface UserInfo {
   Itemcode: string;
   Itemname: string;
   Account: string;
-  Password: string;
   Createdate: string;
   Updatedate: string;
   Disable: boolean;
@@ -23,6 +22,14 @@ export interface LoginResult {
   token: string;
   isAdmin: boolean;
   role: string[];
+  itemCode: string;
+  itemName: string;
+  createDate: string;
+  updateDate: string;
+  disable: boolean;
+  isEmailConfirmed: boolean;
+  activationCode: string;
+  lastLoginAt: string;
 }
 
 export interface ResetPasswdParams {

@@ -3,7 +3,7 @@
     <t-col :flex="3">
       <div class="user-left-greeting">
         <div>
-          Hi，Image
+          Hi，{{ userStore.userInfo.itemname || 'User' }}
           <span class="regular"> {{ $t('pages.user.markDay') }}</span>
         </div>
         <img src="@/assets/assets-tencent-logo.png" class="logo" />
@@ -11,13 +11,32 @@
 
       <t-card class="user-info-list" :title="$t('pages.user.personalInfo.title')" :bordered="false">
         <template #actions>
+          <!-- 编辑按钮
           <t-button theme="default" shape="square" variant="text">
             <t-icon name="ellipsis" />
-          </t-button>
+          </t-button> -->
         </template>
         <t-descriptions :column="4" item-layout="vertical">
-          <t-descriptions-item v-for="(item, index) in USER_INFO_LIST" :key="index" :label="$t(item.title)">
-            {{ item.content }}
+          <t-descriptions-item :label="$t('pages.user.personalInfo.desc.name')">
+            {{ userStore.userInfo.itemname }}
+          </t-descriptions-item>
+          <t-descriptions-item :label="$t('pages.user.personalInfo.desc.id')">
+            {{ userStore.userInfo.itemcode }}
+          </t-descriptions-item>
+          <t-descriptions-item :label="$t('pages.user.personalInfo.desc.email')">
+            {{ userStore.userInfo.isemailconfirmed ? '已验证' : '未验证' }}
+          </t-descriptions-item>
+          <t-descriptions-item :label="$t('pages.user.personalInfo.desc.role')">
+            {{ userStore.userInfo.isAdmin ? '管理员' : '普通用户' }}
+          </t-descriptions-item>
+          <t-descriptions-item :label="$t('pages.user.personalInfo.desc.joinDay')">
+            {{ userStore.userInfo.createdate }}
+          </t-descriptions-item>
+          <t-descriptions-item :label="$t('pages.user.personalInfo.desc.lastLogin')">
+            {{ userStore.userInfo.lastloginat }}
+          </t-descriptions-item>
+          <t-descriptions-item :label="$t('pages.user.personalInfo.desc.status')">
+            {{ userStore.userInfo.disable ? '已禁用' : '正常' }}
           </t-descriptions-item>
         </t-descriptions>
       </t-card>
@@ -50,22 +69,19 @@
 
     <t-col :flex="1">
       <t-card class="user-intro" :bordered="false">
-        <t-avatar size="80px">T</t-avatar>
-        <div class="name">My Account</div>
-        <div class="position">{{ $t('pages.user.personalInfo.position') }}</div>
+        <t-avatar size="80px">Tecul</t-avatar>
+        <div class="name">{{ userStore.userInfo.name }}</div>
+        <div class="position">{{ userStore.userInfo.isAdmin ? '管理员' : '普通用户' }}</div>
       </t-card>
 
       <t-card :title="$t('pages.user.teamMember')" class="user-team" :bordered="false">
-        <template #actions>
-          <t-button theme="default" shape="square" variant="text">
-            <t-icon name="ellipsis" />
-          </t-button>
+        <template v-if="userStore.userInfo.isAdmin">
+          <t-list v-if="disabledUsers.length" :split="false">
+            <t-list-item v-for="(user, index) in disabledUsers" :key="index">
+              <t-list-item-meta :title="user.itemname" :description="user.account" />
+            </t-list-item>
+          </t-list>
         </template>
-        <t-list :split="false">
-          <t-list-item v-for="(item, index) in TEAM_MEMBERS" :key="index">
-            <t-list-item-meta :image="item.avatar" :title="item.title" :description="item.description" />
-          </t-list-item>
-        </t-list>
       </t-card>
 
       <t-card :title="$t('pages.user.serviceProduction')" class="product-container" :bordered="false">
@@ -94,17 +110,18 @@ import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/compon
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import type { DateRangeValue } from 'tdesign-vue-next';
-import { computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
+import { T1GetDisabledUsers } from '@/api/user';
 import ProductAIcon from '@/assets/assets-product-1.svg';
 import ProductBIcon from '@/assets/assets-product-2.svg';
 import ProductCIcon from '@/assets/assets-product-3.svg';
 import ProductDIcon from '@/assets/assets-product-4.svg';
-import { useSettingStore } from '@/store';
+import { useSettingStore, useUserStore } from '@/store';
 import { changeChartsTheme } from '@/utils/color';
 import { LAST_7_DAYS } from '@/utils/date';
 
-import { PRODUCT_LIST, TEAM_MEMBERS, USER_INFO_LIST } from './constants';
+import { PRODUCT_LIST } from './constants';
 import { getFolderLineDataSet } from './index';
 
 echarts.use([GridComponent, TooltipComponent, LineChart, CanvasRenderer, LegendComponent]);
@@ -113,6 +130,7 @@ let lineContainer: HTMLElement;
 let lineChart: echarts.ECharts;
 const store = useSettingStore();
 const chartColors = computed(() => store.chartColors);
+const userStore = useUserStore();
 
 const onLineChange = (value: DateRangeValue) => {
   lineChart.setOption(
@@ -149,6 +167,7 @@ onMounted(() => {
     initChart();
   });
   window.addEventListener('resize', updateContainer, false);
+  fetchDisabledUsers();
 });
 
 onUnmounted(() => {
@@ -176,6 +195,20 @@ watch(
     changeChartsTheme([lineChart]);
   },
 );
+
+const disabledUsers = ref([]);
+
+const fetchDisabledUsers = async () => {
+  if (userStore.userInfo.isAdmin) {
+    try {
+      const response = await T1GetDisabledUsers();
+      disabledUsers.value = response.data || [];
+    } catch (error) {
+      console.error('获取禁用用户列表失败:', error);
+      disabledUsers.value = [];
+    }
+  }
+};
 </script>
 
 <style lang="less" scoped>

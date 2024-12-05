@@ -24,6 +24,18 @@ router.beforeEach(async (to, from, next) => {
       return;
     }
     try {
+      // 如果store中没有用户信息，先尝试从localStorage恢复
+      if (!userStore.userInfo.name) {
+        const localUserInfo = localStorage.getItem('userInfo');
+        if (localUserInfo) {
+          userStore.userInfo = JSON.parse(localUserInfo);
+        }
+      }
+      // 如果仍然没有用户信息，则请求接口
+      if (!userStore.userInfo.name) {
+        await userStore.getUserInfo();
+      }
+
       await userStore.getUserInfo();
 
       const { asyncRoutes } = permissionStore;
