@@ -15,6 +15,12 @@ export enum ApiStatusCode {
   DataNotExists = 1003,
   DataAlreadyExists = 1004,
   OperationFailed = 1005,
+
+  // 网络错误
+  NetworkError = -1,
+
+  // 请求取消
+  RequestCanceled = -2,
 }
 
 // 错误详情接口

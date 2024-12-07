@@ -13,6 +13,7 @@ import throttle from 'lodash/throttle';
 import { stringify } from 'qs';
 
 import { ContentTypeEnum } from '@/constants';
+import { ApiStatusCode } from '@/types/api';
 import { AxiosRequestConfigRetry, RequestOptions, Result } from '@/types/axios';
 
 import { AxiosCanceler } from './AxiosCancel';
@@ -91,43 +92,79 @@ export class VAxios {
     const transform = this.getTransform();
     if (!transform) return;
 
-    const { requestInterceptors, requestInterceptorsCatch, responseInterceptors, responseInterceptorsCatch } =
-      transform;
+    const { responseInterceptors, responseInterceptorsCatch } = transform;
     const axiosCanceler = new AxiosCanceler();
 
-    // 请求拦截器
+    // 请求拦截器配置处理
     this.instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-      // 如果忽略取消令牌，则不会取消重复的请求
-      // @ts-ignore
-      const { ignoreCancelToken } = config.requestOptions;
-      const ignoreCancel = ignoreCancelToken ?? this.options.requestOptions?.ignoreCancelToken;
+      const { requestOptions } = config as any;
+      const ignoreCancel = requestOptions?.ignoreCancelToken ?? this.options.requestOptions?.ignoreCancelToken;
       if (!ignoreCancel) axiosCanceler.addPending(config);
 
-      if (requestInterceptors && isFunction(requestInterceptors)) {
-        config = requestInterceptors(config, this.options) as InternalAxiosRequestConfig;
+      if (transform.requestInterceptors && isFunction(transform.requestInterceptors)) {
+        config = transform.requestInterceptors(config, this.options) as InternalAxiosRequestConfig;
       }
-
       return config;
-    }, undefined);
+    });
 
-    // 请求错误处理
-    if (requestInterceptorsCatch && isFunction(requestInterceptorsCatch)) {
-      this.instance.interceptors.request.use(undefined, requestInterceptorsCatch);
-    }
+    // 响应结果拦截器处理
+    this.instance.interceptors.response.use(
+      (res: AxiosResponse<any>) => {
+        if (res) axiosCanceler.removePending(res.config);
 
-    // 响应结果处理
-    this.instance.interceptors.response.use((res: AxiosResponse) => {
-      if (res) axiosCanceler.removePending(res.config);
-      if (responseInterceptors && isFunction(responseInterceptors)) {
-        res = responseInterceptors(res);
-      }
-      return res;
-    }, undefined);
+        // 处理 HTTP 状态码
+        if (res.status === 401) {
+          return Promise.reject(new AxiosError('登录已过期，请重新登录', '401', res.config, res.request, res));
+        }
 
-    // 响应错误处理
-    if (responseInterceptorsCatch && isFunction(responseInterceptorsCatch)) {
-      this.instance.interceptors.response.use(undefined, (error) => responseInterceptorsCatch(error, this.instance));
-    }
+        if (responseInterceptors && isFunction(responseInterceptors)) {
+          res = responseInterceptors(res);
+        }
+        return res;
+      },
+      (error: AxiosError) => {
+        // 处理网络连接错误 ERR_NETWORK
+        if (error.code === 'ERR_NETWORK') {
+          return Promise.reject(
+            new AxiosError(
+              'setupInterceptors中检测网络错误，请检查网络连接',
+              'ERR_NETWORK',
+              error.config,
+              error.request,
+              error.response,
+            ),
+          );
+        }
+
+        if (error.code === 'ERR_CONNECTION_REFUSED') {
+          return Promise.reject(
+            new AxiosError(
+              '服务器连接失败，请检查服务是否启动',
+              'ERR_CONNECTION_REFUSED',
+              error.config,
+              error.request,
+              error.response,
+            ),
+          );
+        }
+
+        // 处理 HTTP 错误
+        if (error.response?.status === 401) {
+          return Promise.reject(
+            new AxiosError('登录已过期，请重新登录', '401', error.config, error.request, error.response),
+          );
+        }
+
+        if (error.response?.status === 403) {
+          return Promise.reject(new AxiosError('没有权限访问', '403', error.config, error.request, error.response));
+        }
+
+        if (responseInterceptorsCatch && isFunction(responseInterceptorsCatch)) {
+          return responseInterceptorsCatch(error, this.instance);
+        }
+        return Promise.reject(error);
+      },
+    );
   }
 
   /**
@@ -248,9 +285,7 @@ export class VAxios {
   private async synthesisRequest<T = any>(config: AxiosRequestConfigRetry, options?: RequestOptions): Promise<T> {
     let conf: CreateAxiosOptions = cloneDeep(config);
     const transform = this.getTransform();
-
     const { requestOptions } = this.options;
-
     const opt: RequestOptions = { ...requestOptions, ...options };
 
     const { beforeRequestHook, requestCatchHook, transformRequestHook } = transform || {};
@@ -260,8 +295,6 @@ export class VAxios {
     conf.requestOptions = opt;
 
     conf = this.supportFormData(conf);
-    // 支持params数组参数格式化，因axios默认的toFormData即为brackets方式，无需配置paramsSerializer为qs，有需要可解除注释，参数参考qs文档
-    // conf = this.supportParamsStringify(conf);
 
     return new Promise((resolve, reject) => {
       this.instance
@@ -279,12 +312,68 @@ export class VAxios {
           resolve(res as unknown as Promise<T>);
         })
         .catch((e: Error | AxiosError) => {
-          if (requestCatchHook && isFunction(requestCatchHook)) {
-            reject(requestCatchHook(e, opt));
+          // 处理网络连接错误
+          const axiosError = e as AxiosError;
+          if (axiosError.code === 'ERR_CONNECTION_REFUSED') {
+            resolve({
+              code: ApiStatusCode.NetworkError,
+              message: '服务器连接失败，请检查服务是否启动',
+              data: null,
+              traceId: '',
+              timestamp: Date.now(),
+              pagination: null,
+              sort: null,
+              filter: null,
+            } as unknown as T);
             return;
           }
-          if (axios.isAxiosError(e)) {
-            // 在这里重写Axios的错误信息
+
+          if (axiosError.code === 'ERR_NETWORK') {
+            resolve({
+              code: ApiStatusCode.NetworkError,
+              message: '网络错误，请检查服务网络',
+              data: null,
+              traceId: '',
+              timestamp: Date.now(),
+              pagination: null,
+              sort: null,
+              filter: null,
+            } as unknown as T);
+            return;
+          }
+
+          if (axios.isCancel(e)) {
+            resolve({
+              code: ApiStatusCode.RequestCanceled,
+              message: '请求已取消',
+              data: null,
+              traceId: '',
+              timestamp: Date.now(),
+              pagination: null,
+              sort: null,
+              filter: null,
+            } as unknown as T);
+            return;
+          }
+
+          // 处理 HTTP 错误
+          if (axiosError?.response?.status === 401) {
+            resolve({
+              code: ApiStatusCode.TokenExpired,
+              message: '登录已过期，请重新登录',
+              data: null,
+              traceId: '',
+              timestamp: Date.now(),
+              pagination: null,
+              sort: null,
+              filter: null,
+            } as unknown as T);
+            return;
+          }
+
+          if (requestCatchHook && isFunction(requestCatchHook)) {
+            resolve(requestCatchHook(e, opt));
+            return;
           }
           reject(e);
         });

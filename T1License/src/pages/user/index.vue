@@ -111,6 +111,7 @@ import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import type { DateRangeValue } from 'tdesign-vue-next';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { T1GetDisabledUsers } from '@/api/user';
 import ProductAIcon from '@/assets/assets-product-1.svg';
@@ -118,6 +119,8 @@ import ProductBIcon from '@/assets/assets-product-2.svg';
 import ProductCIcon from '@/assets/assets-product-3.svg';
 import ProductDIcon from '@/assets/assets-product-4.svg';
 import { useSettingStore, useUserStore } from '@/store';
+import { ApiStatusCode } from '@/types/api';
+import { handleApiResponse } from '@/utils/apiHelper';
 import { changeChartsTheme } from '@/utils/color';
 import { LAST_7_DAYS } from '@/utils/date';
 
@@ -131,6 +134,7 @@ let lineChart: echarts.ECharts;
 const store = useSettingStore();
 const chartColors = computed(() => store.chartColors);
 const userStore = useUserStore();
+const router = useRouter();
 
 const onLineChange = (value: DateRangeValue) => {
   lineChart.setOption(
@@ -202,11 +206,33 @@ const fetchDisabledUsers = async () => {
   if (userStore.userInfo.isAdmin) {
     try {
       const response = await T1GetDisabledUsers();
-      disabledUsers.value = response.data || [];
+
+      handleApiResponse(response, {
+        onSuccess: (data) => {
+          disabledUsers.value = data || [];
+        },
+        onError: () => {
+          disabledUsers.value = [];
+        },
+        onSpecificError: {
+          [ApiStatusCode.TokenExpired]: () => {
+            disabledUsers.value = [];
+          },
+          [ApiStatusCode.Unauthorized]: () => {
+            disabledUsers.value = [];
+          },
+          [ApiStatusCode.NetworkError]: () => {
+            disabledUsers.value = [];
+          },
+        },
+        router,
+      });
     } catch (error) {
-      console.error('获取禁用用户列表失败:', error);
+      console.error('fetchDisabledUsers方法捕捉到没有处理的错误，请检查代码:', error?.message);
       disabledUsers.value = [];
     }
+  } else {
+    console.error('没有权限访问');
   }
 };
 </script>
