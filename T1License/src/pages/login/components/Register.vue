@@ -164,6 +164,7 @@ const onSubmit = async (ctx: SubmitContext) => {
         },
       });
     } catch (error) {
+      console.error('注册onSubmit方法捕捉到没有处理的错误，请检查代码:', error?.message);
       MessagePlugin.error(error?.message);
     }
   }

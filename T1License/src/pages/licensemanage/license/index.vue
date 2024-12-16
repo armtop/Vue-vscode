@@ -12,9 +12,13 @@
           </p>
         </div>
         <div class="search-input">
-          <t-input v-model="searchValue" :placeholder="$t('pages.licenseManage.placeholder')" clearable
-          @input="handleSearch"
-          @clear="resetSearch">
+          <t-input
+            v-model="searchValue"
+            :placeholder="$t('pages.licenseManage.placeholder')"
+            clearable
+            @input="handleSearch"
+            @clear="resetSearch"
+          >
             <template #suffix-icon>
               <search-icon size="16px" />
             </template>
@@ -260,19 +264,19 @@ const onConfirmDelete = () => {
     licenseList.value.splice(deleteIdx.value, 1);
   } else {
     // 批量删除逻辑
-    licenseList.value = licenseList.value.filter(item => !selectedRowKeys.value.includes(item[rowKey]));
+    licenseList.value = licenseList.value.filter((item) => !selectedRowKeys.value.includes(item[rowKey]));
   }
-  
+
   // 更新分页信息
   pagination.value.total = licenseList.value.length;
-  
+
   // 清空选中状态
   selectedRowKeys.value = [];
-  
+
   confirmVisible.value = false;
   MessagePlugin.success('删除成功');
   resetIdx();
-  
+
   // 强制更新licenseList
   licenseList.value = [...licenseList.value];
 };
@@ -291,9 +295,10 @@ const handleSearch = () => {
   if (searchValue.value.trim() === '') {
     fetchData();
   } else {
-    licenseList.value = licenseList.value.filter(license => 
-      license.customer.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-      license.descr.toLowerCase().includes(searchValue.value.toLowerCase())
+    licenseList.value = licenseList.value.filter(
+      (license) =>
+        license.customer.toLowerCase().includes(searchValue.value.toLowerCase()) ||
+        license.descr.toLowerCase().includes(searchValue.value.toLowerCase()),
     );
   }
   pagination.value.defaultCurrent = 1;

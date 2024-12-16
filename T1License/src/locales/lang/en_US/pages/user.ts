@@ -1,10 +1,12 @@
 export default {
   markDay: '',
+  operation: 'Operation',
   personalInfo: {
     title: 'Personal Info',
     position: 'Employee of the Hong Kong and Macau Business Expansion team',
 
     desc: {
+      account: 'Account',
       phone: 'Phone',
       mobile: 'Mobile',
       seat: 'Seat',
@@ -25,7 +27,8 @@ export default {
   contentList: 'Content List',
   visitData: 'Visit Data',
   teamMember: 'Pending Activation',
-  serviceProduction: 'Service Product',
+  serviceProduction: 'T1 Product',
   noData: 'No Data',
   noPermission: 'No Permission',
+  userManage: 'User Management',
 };

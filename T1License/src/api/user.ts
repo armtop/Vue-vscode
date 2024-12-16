@@ -45,3 +45,36 @@ export function T1GetDisabledUsers(): Promise<ApiResponse<UserInfo[]>> {
     url: `${Api.url}/getdisabledusers`,
   });
 }
+
+export function T1GetUserInfo(): Promise<ApiResponse<UserInfo[]>> {
+  return requestOther.get<ApiResponse<UserInfo[]>>({
+    url: `${Api.url}/getuserinfo`,
+  });
+}
+
+// 添加用户管理相关的API
+export function T1DisableUser(userId: string): Promise<ApiResponse<null>> {
+  return requestOther.put<ApiResponse<null>>({
+    url: `${Api.url}/changedisable/${userId}/true`,
+  });
+}
+
+export function T1EnableUser(userId: string): Promise<ApiResponse<null>> {
+  return requestOther.put<ApiResponse<null>>({
+    url: `${Api.url}/changedisable/${userId}/false`,
+  });
+}
+
+export function T1SetAdmin(userId: string): Promise<ApiResponse<null>> {
+  return requestOther.post<ApiResponse<null>>({
+    url: `${Api.url}/setadmin`,
+    data: { userId },
+  });
+}
+
+export function T1RemoveAdmin(userId: string): Promise<ApiResponse<null>> {
+  return requestOther.post<ApiResponse<null>>({
+    url: `${Api.url}/removeadmin`,
+    data: { userId },
+  });
+}

@@ -218,7 +218,6 @@ const onSubmit = async (ctx: SubmitContext) => {
           onSpecificError: {
             [ApiStatusCode.TokenExpired]: () => {
               // 处理token过期
-              router.push('/login');
             },
             [ApiStatusCode.Unauthorized]: () => {
               // 处理未授权
@@ -241,9 +240,9 @@ const onSubmit = async (ctx: SubmitContext) => {
         const redirectUrl = redirect ? decodeURIComponent(redirect) : '/dashboard';
         router.push(redirectUrl);
       }
-    } catch (e) {
-      console.log(e);
-      MessagePlugin.error(e.message);
+    } catch (error) {
+      console.error('登录onSubmit方法捕捉到没有处理的错误，请检查代码:', error?.message);
+      MessagePlugin.error(error?.message);
     }
   }
 };

@@ -1,9 +1,11 @@
 export default {
   markDay: '',
+  operation: '操作',
   personalInfo: {
     title: '个人信息',
     position: '港澳业务拓展组员工 直客销售 ',
     desc: {
+      account: '账号',
       phone: '座机',
       mobile: '手机',
       seat: '座位',
@@ -24,7 +26,8 @@ export default {
   visitData: '首页访问数据',
   contentList: '内容列表',
   teamMember: '待激活成员',
-  serviceProduction: '服务产品',
+  serviceProduction: 'T1产品',
   noData: '暂无数据',
   noPermission: '没有权限',
+  userManage: '用户管理',
 };
