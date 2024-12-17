@@ -219,6 +219,9 @@ const fetchDisabledUsers = async () => {
           [ApiStatusCode.NetworkError]: () => {
             disabledUsers.value = [];
           },
+          [ApiStatusCode.DataNotExists]: () => {
+            disabledUsers.value = [];
+          },
         },
         router,
       });

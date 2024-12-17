@@ -38,6 +38,9 @@ export function handleApiResponse<T>(
     case ApiStatusCode.RequestCanceled:
       MessagePlugin.warning('请求已取消');
       break;
+    case ApiStatusCode.DataNotExists:
+      console.log('数据不存在');
+      break;
     default:
       if (response.message) {
         MessagePlugin.error(response.message);
