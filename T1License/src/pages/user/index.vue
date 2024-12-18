@@ -31,10 +31,10 @@
             {{ userStore.userInfo.isAdmin ? '管理员' : '普通用户' }}
           </t-descriptions-item>
           <t-descriptions-item :label="$t('pages.user.personalInfo.desc.joinDay')">
-            {{ userStore.userInfo.createdate }}
+            {{ formatDateTime(userStore.userInfo.createdate) }}
           </t-descriptions-item>
           <t-descriptions-item :label="$t('pages.user.personalInfo.desc.lastLogin')">
-            {{ userStore.userInfo.lastloginat }}
+            {{ formatDateTime(userStore.userInfo.lastloginat) }}
           </t-descriptions-item>
           <t-descriptions-item :label="$t('pages.user.personalInfo.desc.status')">
             {{ userStore.userInfo.disable ? '已禁用' : '正常' }}
@@ -48,16 +48,18 @@
             <t-table
               :data="userInfo"
               :columns="COLUMNS"
-              :row-key="'account'"
+              :row-key="'itemcode'"
               vertical-align="top"
               :hover="true"
               :pagination="pagination"
               :selected-row-keys="selectedRowKeys"
               :loading="loading"
               :header-affixed-top="headerAffixedTop"
+              :sort="defaultSort"
               @page-change="handlePageChange"
               @change="rehandleChange"
               @select-change="handleSelectChange"
+              @sort-change="handleSortChange"
             >
               <template #op="slotProps">
                 <t-space>
@@ -76,7 +78,7 @@
                     v-if="!slotProps.row.isAdmin"
                     theme="warning"
                     variant="text"
-                    @click="handleSetAdmin(slotProps.row.itemcode)"
+                    @click="handleSetAdmin(slotProps.row.account)"
                   >
                     设为管理员
                   </t-button>
@@ -161,6 +163,12 @@ const updateContainer = () => {
     width: lineContainer.clientWidth,
     height: lineContainer.clientHeight,
   });
+};
+
+const formatDateTime = (dateTime: string | undefined) => {
+  if (!dateTime) return '-';
+  const date = new Date(dateTime);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 };
 
 onMounted(() => {
@@ -284,19 +292,20 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
   {
     title: t('pages.user.personalInfo.desc.name'),
     align: 'left',
-    width: 120,
+    width: 100,
     colKey: 'itemname',
     fixed: 'left',
   },
   {
     title: t('pages.user.personalInfo.desc.id'),
-    width: 120,
+    width: 100,
     ellipsis: true,
     colKey: 'itemcode',
+    sorter: true,
   },
   {
     title: t('pages.user.personalInfo.desc.account'),
-    width: 120,
+    width: 160,
     ellipsis: true,
     colKey: 'account',
   },
@@ -315,24 +324,27 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
     cell: (h: any, { row }: { row: TableRowData }) => (row.isAdmin ? '管理员' : '普通用户'),
   },
   {
-    title: t('pages.user.personalInfo.desc.joinDay'),
-    width: 160,
-    ellipsis: true,
-    colKey: 'createdate',
-  },
-  {
-    title: t('pages.user.personalInfo.desc.lastLogin'),
-    width: 160,
-    ellipsis: true,
-    colKey: 'lastLoginAt',
-  },
-  {
     title: t('pages.user.personalInfo.desc.status'),
     width: 120,
     ellipsis: true,
     colKey: 'disable',
     cell: (h: any, { row }: { row: TableRowData }) => (row.disable ? '已禁用' : '正常'),
   },
+  {
+    title: t('pages.user.personalInfo.desc.lastLogin'),
+    width: 160,
+    ellipsis: true,
+    colKey: 'lastLoginAt',
+    cell: (h: any, { row }: { row: TableRowData }) => formatDateTime(row.lastLoginAt),
+  },
+  {
+    title: t('pages.user.personalInfo.desc.joinDay'),
+    width: 160,
+    ellipsis: true,
+    colKey: 'createdate',
+    cell: (h: any, { row }: { row: TableRowData }) => formatDateTime(row.createdate),
+  },
+
   {
     title: t('pages.user.operation'),
     align: 'left',
@@ -355,6 +367,20 @@ const handleSelectChange = (val: number[]) => {
   selectedRowKeys.value = val;
 };
 
+const handleSortChange = (sort: { sortBy: string; descending: boolean }) => {
+  if (sort.sortBy === 'itemcode') {
+    userInfo.value.sort((a, b) => {
+      const compareResult = a.itemcode.localeCompare(b.itemcode);
+      return sort.descending ? -compareResult : compareResult;
+    });
+  }
+};
+
+const defaultSort = {
+  sortBy: 'itemcode',
+  descending: false,
+};
+
 const handlePageChange = (curr: number, pageInfo: any) => {
   pagination.value = {
     ...pagination.value,
@@ -372,6 +398,17 @@ const handleDisableUser = async (userId: string) => {
         MessagePlugin.success('用户已禁用');
         fetchUserInfo(); // 刷新列表
       },
+      onError: () => {},
+      onSpecificError: {
+        [ApiStatusCode.TokenExpired]: () => {},
+        [ApiStatusCode.Unauthorized]: () => {},
+        [ApiStatusCode.NetworkError]: () => {},
+        [ApiStatusCode.DataNotExists]: () => {},
+        [ApiStatusCode.OperationFailed]: () => {
+          MessagePlugin.error(response.message);
+        },
+      },
+
       router,
     });
   } catch (error) {
@@ -402,6 +439,18 @@ const handleSetAdmin = async (userId: string) => {
         MessagePlugin.success('已设置为管理员');
         fetchUserInfo();
       },
+      onError: () => {},
+      onSpecificError: {
+        [ApiStatusCode.TokenExpired]: () => {},
+        [ApiStatusCode.Unauthorized]: () => {},
+        [ApiStatusCode.NetworkError]: () => {},
+        [ApiStatusCode.DataNotExists]: () => {
+          MessagePlugin.error(response.message);
+        },
+        [ApiStatusCode.OperationFailed]: () => {
+          MessagePlugin.error(response.message);
+        },
+      },
       router,
     });
   } catch (error) {
@@ -416,6 +465,18 @@ const handleRemoveAdmin = async (userId: string) => {
       onSuccess: () => {
         MessagePlugin.success('已移除管理员权限');
         fetchUserInfo();
+      },
+      onError: () => {},
+      onSpecificError: {
+        [ApiStatusCode.TokenExpired]: () => {},
+        [ApiStatusCode.Unauthorized]: () => {},
+        [ApiStatusCode.NetworkError]: () => {},
+        [ApiStatusCode.DataNotExists]: () => {
+          MessagePlugin.error(response.message);
+        },
+        [ApiStatusCode.OperationFailed]: () => {
+          MessagePlugin.error(response.message);
+        },
       },
       router,
     });

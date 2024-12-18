@@ -66,15 +66,13 @@ export function T1EnableUser(userId: string): Promise<ApiResponse<null>> {
 }
 
 export function T1SetAdmin(userId: string): Promise<ApiResponse<null>> {
-  return requestOther.post<ApiResponse<null>>({
-    url: `${Api.url}/setadmin`,
-    data: { userId },
+  return requestOther.put<ApiResponse<null>>({
+    url: `${Api.url}/setadmin/${userId}`,
   });
 }
 
 export function T1RemoveAdmin(userId: string): Promise<ApiResponse<null>> {
-  return requestOther.post<ApiResponse<null>>({
-    url: `${Api.url}/removeadmin`,
-    data: { userId },
+  return requestOther.put<ApiResponse<null>>({
+    url: `${Api.url}/canceladmin/${userId}`,
   });
 }

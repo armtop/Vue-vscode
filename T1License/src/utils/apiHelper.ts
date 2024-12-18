@@ -1,4 +1,3 @@
-import { MessagePlugin } from 'tdesign-vue-next';
 import type { Router } from 'vue-router';
 
 import type { ApiResponse } from '@/types/api';
@@ -26,24 +25,24 @@ export function handleApiResponse<T>(
   // 处理特定错误码
   switch (response.code) {
     case ApiStatusCode.TokenExpired:
-      MessagePlugin.error('登录已过期，请重新登录');
+      console.error('登录已过期，请重新登录');
       router?.push('/login');
       break;
     case ApiStatusCode.Unauthorized:
-      MessagePlugin.error('没有权限访问');
+      console.error('没有权限访问');
       break;
     case ApiStatusCode.NetworkError:
-      MessagePlugin.error('网络连接失败，请检查网络');
+      console.error('网络连接失败，请检查网络');
       break;
     case ApiStatusCode.RequestCanceled:
-      MessagePlugin.warning('请求已取消');
+      console.error('请求已取消');
       break;
     case ApiStatusCode.DataNotExists:
-      console.log('数据不存在');
+      console.error('数据不存在');
       break;
     default:
       if (response.message) {
-        MessagePlugin.error(response.message);
+        console.error(response.message);
       }
   }
 
