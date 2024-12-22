@@ -301,7 +301,7 @@ const COLUMNS: PrimaryTableCol<TableRowData>[] = [
     width: 100,
     ellipsis: true,
     colKey: 'itemcode',
-    sorter: true,
+    sorter: (a: TableRowData, b: TableRowData) => a.itemcode.localeCompare(b.itemcode),
   },
   {
     title: t('pages.user.personalInfo.desc.account'),

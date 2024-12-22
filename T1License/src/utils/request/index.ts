@@ -245,7 +245,7 @@ function createOtherAxios(opt?: Partial<CreateAxiosOptions>) {
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
         requestOptions: {
           // 接口地址
-          apiUrl: 'https://localhost:32771',
+          apiUrl: 'https://localhost:32769',
           // 是否自动添加接口前缀
           isJoinPrefix: false,
           // 接口前缀
