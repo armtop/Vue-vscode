@@ -39,7 +39,22 @@ export interface ApiResponse<T> {
   timestamp: number;
   data: T;
   error?: ErrorDetail;
-  pagination: any;
-  sort: any;
-  filter: any;
+  pagination: Pagination;
+  sort: Sort;
+  filter: Filter;
 }
+
+export interface Pagination {
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  totalRecords: number;
+  hasNextPage: boolean;
+}
+
+export interface Sort {
+  sortBy: string;
+  sortOrder: string;
+}
+
+export interface Filter {}

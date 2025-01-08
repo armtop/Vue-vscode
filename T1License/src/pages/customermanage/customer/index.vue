@@ -19,19 +19,10 @@
 
     <dialog-form v-model:visible="formDialogVisible" :data="formData" />
 
-    <template v-if="pagination.total > 0 && !dataLoading">
+    <template v-if="pagination.totalRecords > 0 && !dataLoading">
       <div class="list-card-items">
         <t-row :gutter="[16, 16]">
-          <t-col
-            v-for="customer in customerList.slice(
-              pagination.pageSize * (pagination.current - 1),
-              pagination.pageSize * pagination.current,
-            )"
-            :key="customer.ID"
-            :lg="4"
-            :xs="6"
-            :xl="3"
-          >
+          <t-col v-for="customer in customerList" :key="customer.ID" :lg="4" :xs="6" :xl="3">
             <customer-card
               class="list-card-item"
               :customer="customer"
@@ -44,10 +35,12 @@
       </div>
       <div class="list-card-pagination">
         <t-pagination
-          v-model="pagination.current"
+          v-model="pagination.pageNumber"
           v-model:page-size="pagination.pageSize"
-          :total="pagination.total"
-          :page-size-options="[12, 24, 36]"
+          :total="pagination.totalRecords"
+          :page-size-options="[2, 5, 10]"
+          show-total
+          :totao-content="`共 ${pagination.totalRecords} 项`"
           @page-size-change="onPageSizeChange"
           @current-change="onCurrentChange"
         />
@@ -80,10 +73,11 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { getCustomerList } from '@/api/customer';
+import { T1GetCustomerList } from '@/api/customer';
 import type { CardCustomerType } from '@/components/customer-card/index.vue';
 import CustomerCard from '@/components/customer-card/index.vue';
 import { useCustomerStore } from '@/store';
+import { ApiStatusCode } from '@/types/api';
 
 import type { FormData } from './components/DialogForm.vue';
 import DialogForm from './components/DialogForm.vue';
@@ -101,7 +95,13 @@ const INITIAL_DATA: FormData = {
   contactAddress: '',
 };
 
-const pagination = ref({ current: 1, pageSize: 12, total: 0 });
+const pagination = ref({
+  pageNumber: 1,
+  pageSize: 2,
+  totalPages: 0,
+  totalRecords: 0,
+  hasNextPage: false,
+});
 const deleteCustomer = ref(undefined);
 const router = useRouter();
 
@@ -109,41 +109,58 @@ const router = useRouter();
 const customerList = ref([]);
 const dataLoading = ref(true);
 
-const fetchData = async () => {
+const fetchData = async (pageNumber = 1, pageSize = 4) => {
   try {
-    const result = await getCustomerList();
-    const { data } = result;
-    customerList.value = data;
-    pagination.value = {
-      ...pagination.value,
-      total: data.length,
-    };
+    dataLoading.value = true;
+    const result = await T1GetCustomerList(pageNumber, pageSize);
+
+    // 检查 API 响应状态
+    if (result.code === ApiStatusCode.Success) {
+      const { data, pagination: paginationInfo } = result;
+
+      // 更新数据列表
+      customerList.value = data || [];
+
+      // 更新分页信息
+      pagination.value = {
+        pageNumber: paginationInfo.pageNumber,
+        pageSize: paginationInfo.pageSize,
+        totalPages: paginationInfo.totalPages,
+        totalRecords: paginationInfo.totalRecords,
+        hasNextPage: paginationInfo.hasNextPage,
+      };
+    } else {
+      MessagePlugin.error(result.message || '获取客户列表失败');
+      customerList.value = [];
+    }
   } catch (e) {
-    console.log(e);
+    console.error('获取客户列表失败:', e);
+    MessagePlugin.error('获取客户列表失败');
+    customerList.value = [];
+    pagination.value = {
+      pageNumber,
+      pageSize,
+      totalPages: 0,
+      totalRecords: 0,
+      hasNextPage: false,
+    };
   } finally {
     dataLoading.value = false;
   }
 };
 
-const handleSearch = () => {
+const handleSearch = async () => {
   console.log(searchValue.value.trim()); // 添加日志以确认函数被调用
   if (searchValue.value.trim() === '') {
-    fetchData();
+    await fetchData();
   } else {
-    customerList.value = customerList.value.filter(
-      (customer) =>
-        customer.name.toLowerCase().includes(searchValue.value.toLowerCase()) ||
-        customer.description.toLowerCase().includes(searchValue.value.toLowerCase()),
-    );
+    // todo 如果需要搜索，可以传递搜索参数给后端
   }
-  pagination.value.current = 1;
-  pagination.value.total = customerList.value.length;
 };
 
-const resetSearch = () => {
-  fetchData();
-  pagination.value.current = 1;
-  pagination.value.total = customerList.value.length;
+const resetSearch = async () => {
+  searchValue.value = '';
+  await fetchData();
 };
 
 const confirmBody = computed(() =>
@@ -159,32 +176,16 @@ const confirmVisible = ref(false);
 const formData = ref({ ...INITIAL_DATA });
 const searchValue = ref('');
 
-const onPageSizeChange = (size: number) => {
-  pagination.value.pageSize = size;
-  pagination.value.current = 1;
+const onPageSizeChange = async (size: number) => {
+  await fetchData(1, size);
 };
-const onCurrentChange = (current: number) => {
-  pagination.value.current = current;
+const onCurrentChange = async (current: number) => {
+  await fetchData(current, pagination.value.pageSize);
 };
 
 const handleDeleteItem = (customer: CardCustomerType) => {
   confirmVisible.value = true;
   deleteCustomer.value = customer;
-};
-
-const onConfirmDelete = () => {
-  const { ID } = deleteCustomer.value;
-  const initialLength = customerList.value.length;
-  customerList.value = customerList.value.filter((customer) => customer.ID !== ID);
-  if (customerList.value.length < initialLength) {
-    confirmVisible.value = false;
-    MessagePlugin.success('删除成功');
-  } else {
-    MessagePlugin.error('未找到要删除的客户');
-  }
-  // 更新分页信息
-  pagination.value.total = customerList.value.length;
-  pagination.value.current = 1;
 };
 
 const onCancel = () => {
@@ -210,6 +211,22 @@ const handleLicenseCustomer = (customer: CardCustomerType) => {
   customerStore.setCustomer(customer);
   // 跳转到许可创建界面
   router.push({ name: 'creation' });
+};
+
+const onConfirmDelete = async () => {
+  const { ID } = deleteCustomer.value;
+  const initialLength = customerList.value.length;
+  customerList.value = customerList.value.filter((customer) => customer.ID !== ID);
+
+  if (customerList.value.length < initialLength) {
+    confirmVisible.value = false;
+    MessagePlugin.success('删除成功');
+
+    // 删除后重新获取当前页数据
+    await fetchData(pagination.value.pageNumber, pagination.value.pageSize);
+  } else {
+    MessagePlugin.error('未找到要删除的客户');
+  }
 };
 </script>
 <style lang="less" scoped>
