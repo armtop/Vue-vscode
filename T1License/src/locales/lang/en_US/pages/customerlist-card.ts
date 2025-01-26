@@ -3,6 +3,7 @@ export default {
   edit: 'Edit Customer',
   placeholder: 'please enter to search',
   customerID: 'customerID',
+  customerCode: 'customerCode',
   customerName: 'customerName',
   customerisSetup: 'customerStatus',
   customerType: 'customerType',

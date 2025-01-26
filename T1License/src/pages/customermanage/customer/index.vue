@@ -16,13 +16,15 @@
         </t-input>
       </div>
     </div>
-
-    <dialog-form v-model:visible="formDialogVisible" :data="formData" />
-
+    <dialog-form
+      v-model:visible="formDialogVisible"
+      :data="formData"
+      @refresh="fetchData(pagination.pageNumber, pagination.pageSize)"
+    />
     <template v-if="pagination.totalRecords > 0 && !dataLoading">
       <div class="list-card-items">
         <t-row :gutter="[16, 16]">
-          <t-col v-for="customer in customerList" :key="customer.ID" :lg="4" :xs="6" :xl="3">
+          <t-col v-for="customer in customerList" :key="customer.id" :lg="4" :xs="6" :xl="3">
             <customer-card
               class="list-card-item"
               :customer="customer"
@@ -38,7 +40,7 @@
           v-model="pagination.pageNumber"
           v-model:page-size="pagination.pageSize"
           :total="pagination.totalRecords"
-          :page-size-options="[2, 5, 10]"
+          :page-size-options="[5, 10]"
           show-total
           :totao-content="`共 ${pagination.totalRecords} 项`"
           @page-size-change="onPageSizeChange"
@@ -73,31 +75,30 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { T1GetCustomerList } from '@/api/customer';
-import type { CardCustomerType } from '@/components/customer-card/index.vue';
+import { T1GetCustomerList, T1SearchCustomerList } from '@/api/customer';
+import type { CustomerModel } from '@/api/model/customerModel';
 import CustomerCard from '@/components/customer-card/index.vue';
 import { useCustomerStore } from '@/store';
 import { ApiStatusCode } from '@/types/api';
 
-import type { FormData } from './components/DialogForm.vue';
 import DialogForm from './components/DialogForm.vue';
 
-const INITIAL_DATA: FormData = {
-  ID: '0',
-  name: '',
-  isSetup: '0',
-  type: 2,
+const INITIAL_DATA: CustomerModel = {
+  itemCode: '',
+  itemName: '',
+  isSetup: false,
+  category: '1',
   description: '',
-  businessLicenseNumber: '',
-  businessPersonName: '',
-  businessPersonIdNumber: '',
-  businessPersonPhoneNumber: '',
-  contactAddress: '',
+  registNumber: '',
+  manager: '',
+  idCardNumber: '',
+  phoneNumber: '',
+  address: '',
 };
 
 const pagination = ref({
   pageNumber: 1,
-  pageSize: 2,
+  pageSize: 5,
   totalPages: 0,
   totalRecords: 0,
   hasNextPage: false,
@@ -105,14 +106,16 @@ const pagination = ref({
 const deleteCustomer = ref(undefined);
 const router = useRouter();
 
-// const customerList = ref(Array<CustomerModel>);
-const customerList = ref([]);
+const customerList = ref<CustomerModel[]>([]);
 const dataLoading = ref(true);
 
-const fetchData = async (pageNumber = 1, pageSize = 4) => {
+const fetchData = async (pageNumber = 1, pageSize = 5) => {
   try {
     dataLoading.value = true;
-    const result = await T1GetCustomerList(pageNumber, pageSize);
+    const content = searchValue.value.trim();
+    const result = content
+      ? await T1SearchCustomerList(content, pageNumber, pageSize)
+      : await T1GetCustomerList(pageNumber, pageSize);
 
     // 检查 API 响应状态
     if (result.code === ApiStatusCode.Success) {
@@ -120,6 +123,7 @@ const fetchData = async (pageNumber = 1, pageSize = 4) => {
 
       // 更新数据列表
       customerList.value = data || [];
+      console.log(customerList.value);
 
       // 更新分页信息
       pagination.value = {
@@ -151,16 +155,12 @@ const fetchData = async (pageNumber = 1, pageSize = 4) => {
 
 const handleSearch = async () => {
   console.log(searchValue.value.trim()); // 添加日志以确认函数被调用
-  if (searchValue.value.trim() === '') {
-    await fetchData();
-  } else {
-    // todo 如果需要搜索，可以传递搜索参数给后端
-  }
+  await fetchData(1, pagination.value.pageSize); // 搜索时重置到第一页
 };
 
 const resetSearch = async () => {
   searchValue.value = '';
-  await fetchData();
+  await fetchData(1, pagination.value.pageSize); // 重置搜索时也重置到第一页
 };
 
 const confirmBody = computed(() =>
@@ -183,7 +183,7 @@ const onCurrentChange = async (current: number) => {
   await fetchData(current, pagination.value.pageSize);
 };
 
-const handleDeleteItem = (customer: CardCustomerType) => {
+const handleDeleteItem = (customer: CustomerModel) => {
   confirmVisible.value = true;
   deleteCustomer.value = customer;
 };
@@ -193,18 +193,18 @@ const onCancel = () => {
   formData.value = { ...INITIAL_DATA };
 };
 
-const handleManageCustomer = (customer: CardCustomerType) => {
+const handleManageCustomer = (customer: CustomerModel) => {
   formDialogVisible.value = true;
   formData.value = {
     ...INITIAL_DATA,
     ...customer,
-    isSetup: customer.isSetup ? '1' : '0', //  修改为枚举
-    ID: customer.ID.toString(), // 将 ID 转换为字符串
+    // IsSetup: customer.IsSetup ? true : false, //  修改为枚举
+    id: customer.id.toString(), // 将 ID 转换为字符串
   };
 };
 
 const customerStore = useCustomerStore();
-const handleLicenseCustomer = (customer: CardCustomerType) => {
+const handleLicenseCustomer = (customer: CustomerModel) => {
   // 情况之前的数据
   customerStore.clearCustomer();
   // 保存customer到store
@@ -216,7 +216,7 @@ const handleLicenseCustomer = (customer: CardCustomerType) => {
 const onConfirmDelete = async () => {
   const { ID } = deleteCustomer.value;
   const initialLength = customerList.value.length;
-  customerList.value = customerList.value.filter((customer) => customer.ID !== ID);
+  customerList.value = customerList.value.filter((customer) => customer.id !== ID);
 
   if (customerList.value.length < initialLength) {
     confirmVisible.value = false;

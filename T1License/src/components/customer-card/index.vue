@@ -4,11 +4,11 @@
     <template #avatar>
       <t-avatar size="56px">
         <template #icon>
-          <shop-icon v-if="customer.type === 1" />
-          <calendar-icon v-if="customer.type === 2" />
-          <service-icon v-if="customer.type === 3" />
-          <user-avatar-icon v-if="customer.type === 4" />
-          <laptop-icon v-if="customer.type === 5" />
+          <shop-icon v-if="customer.category === '1'" />
+          <calendar-icon v-if="customer.category === '2'" />
+          <service-icon v-if="customer.category === '3'" />
+          <user-avatar-icon v-if="customer.category === '4'" />
+          <laptop-icon v-if="customer.category === '5'" />
         </template>
       </t-avatar>
     </template>
@@ -20,16 +20,15 @@
     </template>
     <!-- 定义卡片内容 -->
     <template #content>
-      <p class="list-card-item_detail--name">{{ customer.name }}</p>
-      <p class="list-card-item_detail--id">{{ customer.ID }}</p>
-      <p class="list-card-item_detail--desc">{{ customer.businessPersonName }}</p>
-      <p class="list-card-item_detail--desc">{{ customer.businessPersonPhoneNumber }}</p>
-      <p class="list-card-item_detail--desc">{{ customer.contactAddress }}</p>
+      <p class="list-card-item_detail--name">{{ customer.itemName }}</p>
+      <p class="list-card-item_detail--desc">{{ customer.manager }}</p>
+      <p class="list-card-item_detail--desc">{{ customer.phoneNumber }}</p>
+      <p class="list-card-item_detail--desc">{{ customer.address }}</p>
     </template>
     <!-- 定义卡片底部 -->
     <template #footer>
       <t-avatar-group cascading="left-up" :max="5">
-        <t-avatar>{{ typeMap[customer.type - 1] }}</t-avatar>
+        <t-avatar>{{ typeMap[Number(customer.category) - 1] }}</t-avatar>
         <t-avatar>
           <template #icon>
             <add-icon />
@@ -80,25 +79,13 @@ import {
 } from 'tdesign-icons-vue-next';
 import type { PropType } from 'vue';
 
-// 定义组件接口
-export interface CardCustomerType {
-  ID: number; // 客户ID
-  name: string; // 客户名称
-  isSetup: boolean; // 是否已启用
-  type: number; // 客户类型
-  description: string; // 描述
-  businessLicenseNumber: string; // 营业执照注册号
-  businessPersonName: string; // 营业者
-  businessPersonIdNumber: string; // 营业者身份证号
-  businessPersonPhoneNumber: string; // 营业者手机号
-  contactAddress: string; // 联系地址
-}
+import type { CustomerModel } from '@/api/model/customerModel';
 
 // 使用一个常量来定义组件的属性
-const props = defineProps({
-  // 定义一个名为 customer 的属性，其类型是一个对象，使用类型断言 as PropType<CardCustomerType> 来指定其类型
+defineProps({
   customer: {
-    type: Object as PropType<CardCustomerType>,
+    type: Object as PropType<CustomerModel>,
+    required: true,
   },
 });
 
@@ -108,7 +95,7 @@ const emit = defineEmits(['license-customer', 'manage-customer', 'delete-item'])
 
 const typeMap = ['A', 'B', 'C', 'D', 'E']; // 定义客户类型，如普通客户、重要客户
 
-const handleClickLicense = (customer: CardCustomerType) => {
+const handleClickLicense = (customer: CustomerModel) => {
   emit('license-customer', customer);
 };
 
@@ -121,7 +108,7 @@ const handleClickLicense = (customer: CardCustomerType) => {
  *
  * @param {CardCustomerType} customer - 被点击的客户信息对象
  */
-const handleClickManage = (customer: CardCustomerType) => {
+const handleClickManage = (customer: CustomerModel) => {
   emit('manage-customer', customer);
 };
 
@@ -136,7 +123,7 @@ const handleClickManage = (customer: CardCustomerType) => {
  *        当删除操作触发时，将这个对象传递给上级组件，以便于上级组件
  *        能够识别出具体是哪一位客户的信息被删除。
  */
-const handleClickDelete = (customer: CardCustomerType) => {
+const handleClickDelete = (customer: CustomerModel) => {
   emit('delete-item', customer);
 };
 </script>
@@ -163,6 +150,7 @@ const handleClickDelete = (customer: CardCustomerType) => {
       text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
     }
   }

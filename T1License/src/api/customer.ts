@@ -23,6 +23,28 @@ export function T1GetCustomerList(pageNumber: number, pageSize: number): Promise
   });
 }
 
+export function T1SearchCustomerList(
+  content: string,
+  pageNumber: number,
+  pageSize: number,
+): Promise<ApiResponse<CustomerModel[]>> {
+  return requestOther.get<ApiResponse<CustomerModel[]>>({
+    url: `${Api.url}/search`,
+    params: {
+      content,
+      pageNumber,
+      pageSize,
+    },
+  });
+}
+
+export function T1AddCustomer(body: CustomerModel): Promise<ApiResponse<CustomerModel>> {
+  return requestOther.post<ApiResponse<CustomerModel>>({
+    url: `${Api.url}/add`,
+    data: body,
+  });
+}
+
 /* export function createCustomerl(body: string) {
   return request.post<CustomerListResult>({
     url: `${Api.url}`,

@@ -3,6 +3,7 @@ export default {
   edit: '编辑客户',
   placeholder: '请输入查询内容',
   customerID: '客户ID',
+  customerCode: '客户编码',
   customerName: '客户名称',
   customerisSetup: '客户状态',
   customerType: '客户类型',
