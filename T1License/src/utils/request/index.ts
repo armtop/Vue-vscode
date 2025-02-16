@@ -245,7 +245,7 @@ function createOtherAxios(opt?: Partial<CreateAxiosOptions>) {
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
         requestOptions: {
           // 接口地址
-          apiUrl: 'https://localhost:32769',
+          apiUrl: 'https://localhost:32791',
           // 是否自动添加接口前缀
           isJoinPrefix: false,
           // 接口前缀
@@ -271,6 +271,8 @@ function createOtherAxios(opt?: Partial<CreateAxiosOptions>) {
             count: 3,
             delay: 1000,
           },
+          // 全局忽略请求取消
+          ignoreCancelToken: false,
         },
       },
       opt || {},

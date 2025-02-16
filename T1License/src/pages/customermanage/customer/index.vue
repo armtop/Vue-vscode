@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="list-card-operation">
-      <t-button @click="formDialogVisible = true">{{ $t('pages.customerlistCard.create') }}</t-button>
+      <t-button @click="handleCreateCustomer">{{ $t('pages.customerlistCard.create') }}</t-button>
       <div class="search-input">
         <t-input
           v-model="searchValue"
@@ -40,7 +40,7 @@
           v-model="pagination.pageNumber"
           v-model:page-size="pagination.pageSize"
           :total="pagination.totalRecords"
-          :page-size-options="[5, 10]"
+          :page-size-options="[8]"
           show-total
           :totao-content="`共 ${pagination.totalRecords} 项`"
           @page-size-change="onPageSizeChange"
@@ -75,15 +75,17 @@ import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { T1GetCustomerList, T1SearchCustomerList } from '@/api/customer';
+import { T1DeleteCustomer, T1GetCustomerList, T1SearchCustomerList } from '@/api/customer';
 import type { CustomerModel } from '@/api/model/customerModel';
 import CustomerCard from '@/components/customer-card/index.vue';
 import { useCustomerStore } from '@/store';
 import { ApiStatusCode } from '@/types/api';
+import { handleApiResponse } from '@/utils/apiHelper';
 
 import DialogForm from './components/DialogForm.vue';
 
 const INITIAL_DATA: CustomerModel = {
+  id: '',
   itemCode: '',
   itemName: '',
   isSetup: false,
@@ -94,11 +96,13 @@ const INITIAL_DATA: CustomerModel = {
   idCardNumber: '',
   phoneNumber: '',
   address: '',
+  createDate: undefined,
+  updateDate: undefined,
 };
 
 const pagination = ref({
   pageNumber: 1,
-  pageSize: 5,
+  pageSize: 8,
   totalPages: 0,
   totalRecords: 0,
   hasNextPage: false,
@@ -109,7 +113,7 @@ const router = useRouter();
 const customerList = ref<CustomerModel[]>([]);
 const dataLoading = ref(true);
 
-const fetchData = async (pageNumber = 1, pageSize = 5) => {
+const fetchData = async (pageNumber = 1, pageSize = 8) => {
   try {
     dataLoading.value = true;
     const content = searchValue.value.trim();
@@ -164,7 +168,7 @@ const resetSearch = async () => {
 };
 
 const confirmBody = computed(() =>
-  deleteCustomer.value ? `确认删除后${deleteCustomer.value.name}的所有信息将被清空, 且无法恢复` : '',
+  deleteCustomer.value ? `确认删除后${deleteCustomer.value.itemName}的所有信息将被清空, 且无法恢复` : '',
 );
 
 onMounted(() => {
@@ -214,19 +218,41 @@ const handleLicenseCustomer = (customer: CustomerModel) => {
 };
 
 const onConfirmDelete = async () => {
-  const { ID } = deleteCustomer.value;
-  const initialLength = customerList.value.length;
-  customerList.value = customerList.value.filter((customer) => customer.id !== ID);
+  const { id } = deleteCustomer.value;
 
-  if (customerList.value.length < initialLength) {
-    confirmVisible.value = false;
-    MessagePlugin.success('删除成功');
+  try {
+    const response = await T1DeleteCustomer(id);
+    handleApiResponse(response, {
+      onSuccess: () => {
+        // 本地更新数据
+        customerList.value = customerList.value.filter((customer) => customer.id !== id);
 
-    // 删除后重新获取当前页数据
-    await fetchData(pagination.value.pageNumber, pagination.value.pageSize);
-  } else {
-    MessagePlugin.error('未找到要删除的客户');
+        // 更新分页信息
+        pagination.value = {
+          ...pagination.value,
+          totalRecords: pagination.value.totalRecords - 1,
+          totalPages: Math.ceil((pagination.value.totalRecords - 1) / pagination.value.pageSize),
+          hasNextPage: pagination.value.pageNumber * pagination.value.pageSize < pagination.value.totalRecords - 1,
+        };
+
+        confirmVisible.value = false;
+        MessagePlugin.success('删除成功');
+      },
+      onError: () => {
+        MessagePlugin.error('删除失败');
+      },
+      router,
+    });
+  } catch (error) {
+    MessagePlugin.error('删除失败');
   }
+};
+
+const handleCreateCustomer = () => {
+  // 清空表单数据
+  formData.value = { ...INITIAL_DATA };
+  // 打开对话框
+  formDialogVisible.value = true;
 };
 </script>
 <style lang="less" scoped>
